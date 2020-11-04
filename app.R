@@ -155,7 +155,7 @@ server <- function(input, output, session) {
       magick::image_write(
         magick::image_convert(magick::image_read(input$in_img_profile$datapath),"png"),
         path=file.path(store$epath,"image.png"),format="png")
-      img_profile <- png::readPNG("image.png")
+      img_profile <- png::readPNG(file.path(store$epath,"image.png"))
     }
     
     f <- "Merriweather"
