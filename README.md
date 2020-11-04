@@ -18,7 +18,7 @@ Click [here](https://roymf.shinyapps.io/doorsign/) to access an online instance 
 docker run --rm -p 8787:8787 royfrancis/shiny-doorsign:v1.0.0
 ```
 
-The app should be available through a web browser at `http://0.0.0.0:3838`.
+The app should be available through a web browser at `http://0.0.0.0:8787`.
 
 ### Run in R
 
