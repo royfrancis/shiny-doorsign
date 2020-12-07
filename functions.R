@@ -1,6 +1,7 @@
 # doorsign
 # functions
 
+
 library(Cairo)
 library(curl)
 library(ggplot2)
@@ -8,6 +9,7 @@ library(ggplot2)
 library(magick)
 library(png)
 library(shiny)
+library(shinyBS)
 library(shinythemes)
 library(showtext)
 
@@ -16,7 +18,7 @@ showtext_opts(dpi=300)
 
 # fn_version
 fn_version <- function() {
-  return("v1.1.0")
+  return("v1.1.1")
 }
 
 # validation
@@ -161,7 +163,7 @@ im_dims_left <- function(im,im_width,im_offset_x,im_offset_y,canvas_height,canva
 #' @param path_export Export path [character]
 #' @param format_export Export filetype, png or pdf [character]
 #' 
-plot_doorsign <- function(dfr,pos_x=0.12,pos_y_text=0.56,line_spacing=0.042,canvas_height=210,canvas_width=148.5,
+plot_doorsign <- function(dfr,pos_x=0.12,pos_y_text=0.56,line_spacing=0.042,canvas_height=210,canvas_width=297,
                           im_profile=NULL,im_profile_width=0.4,im_profile_offset_x=NULL,im_profile_offset_y=0.2,
                           logo_left=NULL,logo_left_width=0.14,logo_left_offset_x=0.06,logo_left_offset_y=0.03,
                           logo_right=NULL,logo_right_width=0.26,logo_right_offset_x=0.06,logo_right_offset_y=0.03,
@@ -201,7 +203,7 @@ plot_doorsign <- function(dfr,pos_x=0.12,pos_y_text=0.56,line_spacing=0.042,canv
   
   # add right logo
   if(!is.null(logo_right)) {
-    dims_logo_right <- im_dims_right(logo_right,logo_right_width,logo_right_offset_x,logo_right_offset_y,canvas_height,canvas_width)
+    dims_logo_right <- im_dims_right(logo_right,logo_right_width,logo_right_offset_x,logo_right_offset_y,canvas_height,canvas_width/2)
     if(!debug) p <- p + annotation_raster(logo_right,xmin=dims_logo_right$xmin,xmax=dims_logo_right$xmax,
                                           ymin=dims_logo_right$ymin,ymax=dims_logo_right$ymax)
     if(debug) p <- p+annotate("rect",xmin=dims_logo_right$xmin,xmax=dims_logo_right$xmax,
@@ -216,7 +218,7 @@ plot_doorsign <- function(dfr,pos_x=0.12,pos_y_text=0.56,line_spacing=0.042,canv
   
   # add left logo
   if(!is.null(logo_left)) {
-    dims_logo_left <- im_dims_left(logo_left,logo_left_width,logo_left_offset_x,logo_left_offset_y,canvas_height,canvas_width)
+    dims_logo_left <- im_dims_left(logo_left,logo_left_width,logo_left_offset_x,logo_left_offset_y,canvas_height,canvas_width/2)
     if(!debug) p <- p + annotation_raster(logo_left,xmin=dims_logo_left$xmin,xmax=dims_logo_left$xmax,
                                           ymin=dims_logo_left$ymin,ymax=dims_logo_left$ymax)
     if(debug) p <- p+annotate("rect",xmin=dims_logo_left$xmin,xmax=dims_logo_left$xmax,
@@ -232,7 +234,7 @@ plot_doorsign <- function(dfr,pos_x=0.12,pos_y_text=0.56,line_spacing=0.042,canv
   # add profile image
   if(!is.null(im_profile)) {
     
-    dims_im_profile <- im_dims_left(im_profile,im_profile_width,im_profile_offset_x,im_profile_offset_y,canvas_height,canvas_width)
+    dims_im_profile <- im_dims_left(im_profile,im_profile_width,im_profile_offset_x,im_profile_offset_y,canvas_height,canvas_width/2)
     if(!debug) p <- p + annotation_raster(im_profile,xmin=dims_im_profile$xmin,xmax=dims_im_profile$xmax,
                                           ymin=dims_im_profile$ymin,ymax=dims_im_profile$ymax)
     if(debug) p <- p+annotate("rect",xmin=dims_im_profile$xmin,xmax=dims_im_profile$xmax,
@@ -249,7 +251,7 @@ plot_doorsign <- function(dfr,pos_x=0.12,pos_y_text=0.56,line_spacing=0.042,canv
   if(!is.null(logo_email)) {
     dfr_email <- subset(dfr,dfr$type=="email")
     for(i in 1:nrow(dfr_email)) {
-      dims_logo_email <- im_dims_left(logo_email,logo_comm_width,logo_comm_offset_x,1-(dfr_email$y[i]),canvas_height,canvas_width)
+      dims_logo_email <- im_dims_left(logo_email,logo_comm_width,logo_comm_offset_x,1-(dfr_email$y[i]),canvas_height,canvas_width/2)
       if(!debug) p <- p + annotation_raster(logo_email,xmin=dims_logo_email$xmin,xmax=dims_logo_email$xmax,
                                             ymin=dims_logo_email$ymin,ymax=dims_logo_email$ymax)
       if(debug) p <- p+annotate("rect",xmin=dims_logo_email$xmin,xmax=dims_logo_email$xmax,
@@ -266,7 +268,7 @@ plot_doorsign <- function(dfr,pos_x=0.12,pos_y_text=0.56,line_spacing=0.042,canv
   if(!is.null(logo_phone)) {
     dfr_phone <- subset(dfr,dfr$type=="phone")
     for(i in 1:nrow(dfr_phone)) {
-      dims_logo_phone <- im_dims_left(logo_phone,logo_comm_width,logo_comm_offset_x,1-dfr_phone$y[i],canvas_height,canvas_width)
+      dims_logo_phone <- im_dims_left(logo_phone,logo_comm_width,logo_comm_offset_x,1-dfr_phone$y[i],canvas_height,canvas_width/2)
       if(!debug) p <- p + annotation_raster(logo_phone,xmin=dims_logo_phone$xmin,xmax=dims_logo_phone$xmax,
                                             ymin=dims_logo_phone$ymin,ymax=dims_logo_phone$ymax)
       if(debug) p <- p+annotate("rect",xmin=dims_logo_phone$xmin,xmax=dims_logo_phone$xmax,
@@ -297,11 +299,8 @@ plot_doorsign <- function(dfr,pos_x=0.12,pos_y_text=0.56,line_spacing=0.042,canv
           plot.margin=margin(0,0,0,0),
           axis.ticks.length=unit(0,"pt"))
   
-  height <- 210
-  width <- 297
-  
   if(format_export=="pdf") {
-    grDevices::cairo_pdf(file=file.path(path_export,"door-sign.pdf"),height=round(height/25.4,2),width=round(width/25.4,2))
+    grDevices::cairo_pdf(file=file.path(path_export,"door-sign.pdf"),height=round(canvas_height/25.4,2),width=round(canvas_width/25.4,2))
     showtext::showtext_begin()
     print(p)
     showtext::showtext_end()
@@ -309,7 +308,7 @@ plot_doorsign <- function(dfr,pos_x=0.12,pos_y_text=0.56,line_spacing=0.042,canv
   }
   
   if(format_export=="png") {
-    grDevices::png(file=file.path(path_export,"door-sign.png"),width=width,height=height,units="mm",res=300,type="cairo")
+    grDevices::png(file=file.path(path_export,"door-sign.png"),width=canvas_width,height=canvas_height,units="mm",res=300,type="cairo")
     showtext::showtext_begin()
     print(p)
     showtext::showtext_end()
