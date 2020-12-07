@@ -9,7 +9,6 @@ library(ggplot2)
 library(magick)
 library(png)
 library(shiny)
-library(shinyBS)
 library(shinythemes)
 library(showtext)
 

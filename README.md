@@ -25,7 +25,7 @@ The app should be available through a web browser at `http://0.0.0.0:8787`.
 Install the following R packages:
 
 ```
-install.packages(c(Cairo, curl, ggplot2, magick, png, shiny, shinyBS, shinythemes, showtext))
+install.packages(c(Cairo, curl, ggplot2, magick, png, shiny, shinythemes, showtext))
 ```
 
 This repo is not an R package. In the root directory of this repo, run app using `shiny::runApp("app.R")`.
