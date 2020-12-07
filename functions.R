@@ -1,7 +1,6 @@
 # doorsign
 # functions
 
-
 library(Cairo)
 library(curl)
 library(ggplot2)
@@ -9,6 +8,7 @@ library(ggplot2)
 library(magick)
 library(png)
 library(shiny)
+library(shinyBS)
 library(shinythemes)
 library(showtext)
 
@@ -17,7 +17,7 @@ showtext_opts(dpi=300)
 
 # fn_version
 fn_version <- function() {
-  return("v1.1.1")
+  return("v1.1.2")
 }
 
 # validation
