@@ -40,7 +40,7 @@ ui <- fluidPage(theme=shinytheme("flatly"),
                                            numericInput("in_im_profile_width","Image size",min=0.10,max=0.80,value=0.40,step=0.01),
                                            shinyBS::bsTooltip(id="in_im_profile_width",title="Width of profile image. Value between 0.1 and 0.8.",placement="top",trigger="hover")
                                     ),
-                                    column(6,
+                                    column(6,class="no-pad-left",
                                            numericInput("in_im_profile_offset_y","Image position",min=0.01,max=0.40,value=0.20,step=0.01),
                                            shinyBS::bsTooltip(id="in_im_profile_offset_y",title="Distance of profile image from top edge. Value between 0.01 and 0.2.",placement="top",trigger="hover")
                                     )
@@ -51,7 +51,7 @@ ui <- fluidPage(theme=shinytheme("flatly"),
                                                   shinyBS::bsTooltip(id="in_nudge_x",title="Horizontal adjustment for profile image inside circular mask. Relevant for landscape images. Value between -100 and 100.",placement="top",trigger="hover")
                                                   
                                            ),
-                                           column(6,
+                                           column(6,class="no-pad-left",
                                                   numericInput("in_nudge_y","Image nudge y",min=-100,max=100,value=0,step=1),
                                                   shinyBS::bsTooltip(id="in_nudge_y",title="Vertical adjustment for profile image inside circular mask. Relevant for portrait images. Value between -100 and 100.",placement="top",trigger="hover")
                                            )
@@ -78,33 +78,6 @@ server <- function(input, output, session) {
   
   ## get temporary directory
   store <- reactiveValues(epath=tempdir())
-  
-  ## UI: ui_settings -----------------------------------------------------------
-  ## ui to display settings
-  output$ui_settings <- renderUI({
-    validate(fn_validate(input$in_settings))
-    
-    if(input$in_settings) {
-      column(3,style="max-width:300px;border-radius:4px;background:#ebedef;",
-             h4("Settings"),
-             div(
-               tags$b("Label 1"),
-               fluidRow(
-                 column(4,style=list("padding-right: 3px;"),
-                        numericInput("in_label1_size",label="Size",value=8,min=0,max=20,step=0.5)
-                 ),
-                 column(4,style=list("padding-right: 3px; padding-left: 3px;"),
-                        numericInput("in_label1_x",label="Hor pos",value=0.5,min=0,max=1,step=0.02)
-                 ),
-                 column(4,style=list("padding-left: 3px;"),
-                        numericInput("in_label1_y",label="Ver pos",value=0.54,min=0,max=1,step=0.02)
-                 )
-               )
-             )
-      )
-    }
-    
-  })
   
   ## FN: fn_params ------------------------------------------------------------
   ## function to get plot params
