@@ -15,7 +15,7 @@ Click [here](https://roymf.shinyapps.io/doorsign/) to access an online instance 
 ### Run using docker
 
 ```
-docker run --rm -p 8787:8787 royfrancis/shiny-doorsign:v1.1.2
+docker run --rm -p 8787:8787 royfrancis/shiny-doorsign:v1.2
 ```
 
 The app should be available through a web browser at `http://0.0.0.0:8787`.
@@ -30,4 +30,4 @@ install.packages(c(Cairo, curl, ggplot2, magick, png, shiny, shinyBS, shinytheme
 
 This repo is not an R package. In the root directory of this repo, run app using `shiny::runApp("app.R")`.
 
-2020 • Roy Francis
+2022 • Roy Francis
