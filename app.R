@@ -6,81 +6,46 @@ source("functions.R")
 
 # UI ---------------------------------------------------------------------------
 
-ui <- fluidPage(
-  theme = shinytheme("flatly"),
+ui <- page_fixed(
+  title = "Doorsign",
+  theme = bs_theme(primary = "#A7C947"),
   tags$head(tags$link(rel = "stylesheet", type = "text/css", href = "styles.css")),
-  fixedRow(
-    column(12,
-      style = "margin:15px;",
-      fluidRow(
-        style = "margin-bottom:10px;",
-        span(tags$img(src = "nbis.png", style = "height:18px;"), style = "vertical-align:top;display:inline-block;"),
-        span(tags$h4("•", style = "margin:0px;margin-left:6px;margin-right:6px;"), style = "vertical-align:top;display:inline-block;"),
-        span(tags$h4(strong("Door Sign"), style = "margin:0px;"), style = "vertical-align:middle;display:inline-block;")
-      ),
-      fixedRow(
-        column(3,
-          style = "max-width:330px;background:#ebedef;padding-top:15px;padding-bottom:15px;border-radius:4px;",
-          fluidRow(
-            column(12,
-              style = "margin-bottom:10px;",
-              textInput("in_text_name", NULL, value = "John Doe", placeholder = "Name"),
-              textInput("in_text_title", NULL, value = "Bioinformatician; NBIS", placeholder = "Job title"),
-              textInput("in_text_dept", NULL, value = "Dept. of Cell and Molecular Biology (ICM)", placeholder = "Department"),
-              textInput("in_text_email", NULL, value = "john.doe@nbis.se,john.doe@scilifelab.se", placeholder = "Email(s)"),
-              shinyBS::bsTooltip(id = "in_text_email", title = "Enter multiple emails using comma (,).", placement = "top", trigger = "hover"),
-              textInput("in_text_phone", NULL, value = "0730000000", placeholder = "Phone"),
-              shinyBS::bsTooltip(id = "in_text_phone", title = "Enter multiple phone numbers using comma (,).", placement = "top", trigger = "hover")
-              # HTML('<div class="help-note"><i class="fas fa-info-circle"></i>  Enter multiple email/phone using comma (,).</div>')
-            )
-          ),
-          sliderInput("in_pos_y_text", "Text vertical position", min = 0.10, max = 0.90, value = 0.56, step = 0.01),
-          fluidRow(
-            column(12,
-              style = "margin-top:15px;",
-              fileInput("in_im_profile", "Profile image", multiple = FALSE)
-            )
-          ),
-          fluidRow(
-            column(6,
-              class = "no-pad-right",
-              numericInput("in_im_profile_width", "Image size", min = 0.10, max = 0.80, value = 0.40, step = 0.01),
-              shinyBS::bsTooltip(id = "in_im_profile_width", title = "Width of profile image. Value between 0.1 and 0.8.", placement = "top", trigger = "hover")
-            ),
-            column(6,
-              class = "no-pad-left",
-              numericInput("in_im_profile_offset_y", "Image position", min = 0.01, max = 0.40, value = 0.20, step = 0.01),
-              shinyBS::bsTooltip(id = "in_im_profile_offset_y", title = "Distance of profile image from top edge. Value between 0.01 and 0.2.", placement = "top", trigger = "hover")
-            )
-          ),
-          fluidRow(
-            style = "margin-bottom:15px;margin-top:5px;",
-            column(6,
-              class = "no-pad-right",
-              numericInput("in_nudge_x", "Image nudge x", min = -100, max = 100, value = 0, step = 1),
-              shinyBS::bsTooltip(id = "in_nudge_x", title = "Horizontal adjustment for profile image inside circular mask. Relevant for landscape images. Value between -100 and 100.", placement = "top", trigger = "hover")
-            ),
-            column(6,
-              class = "no-pad-left",
-              numericInput("in_nudge_y", "Image nudge y", min = -100, max = 100, value = 0, step = 1),
-              shinyBS::bsTooltip(id = "in_nudge_y", title = "Vertical adjustment for profile image inside circular mask. Relevant for portrait images. Value between -100 and 100.", placement = "top", trigger = "hover")
-            )
-          ),
-          div(
-            style = "margin-top:25px;margin-bottom:25px;",
-            actionButton("btn_update", "Update"),
-            downloadButton("btn_download", "Download"),
-            shinyBS::bsTooltip(id = "btn_download", title = "Print on A4 paper at 105% scaling and fold in half.", placement = "right", trigger = "hover")
-          ),
+  card(
+    card_header(
+      h2("DoorSign"),
+      div(style = "font-size:90%;", "A5 size door signage")
+    ),
+    layout_sidebar(
+      sidebar(
+        width="30%",
+        textInput("in_text_name", NULL, value = "John Doe", placeholder = "Name"),
+        textInput("in_text_title", NULL, value = "Bioinformatician; NBIS", placeholder = "Job title"),
+        textInput("in_text_dept", NULL, value = "Dept. of Cell and Molecular Biology (ICM)", placeholder = "Department"),
+        textInput("in_text_email", NULL, value = "john.doe@nbis.se,john.doe@scilifelab.se", placeholder = "Email(s)"),
+        shinyBS::bsTooltip(id = "in_text_email", title = "Enter multiple emails using comma (,).", placement = "top", trigger = "hover"),
+        textInput("in_text_phone", NULL, value = "0730000000", placeholder = "Phone"),
+        shinyBS::bsTooltip(id = "in_text_phone", title = "Enter multiple phone numbers using comma (,).", placement = "top", trigger = "hover"),
+        # HTML('<div class="help-note"><i class="fas fa-info-circle"></i>  Enter multiple email/phone using comma (,).</div>')
+        sliderInput("in_pos_y_text", "Text vertical position", min = 0.10, max = 0.90, value = 0.56, step = 0.01),
+        fileInput("in_im_profile", "Profile image", multiple = FALSE),
+        numericInput("in_im_profile_width", "Image size", min = 0.10, max = 0.80, value = 0.40, step = 0.01),
+        shinyBS::bsTooltip(id = "in_im_profile_width", title = "Width of profile image. Value between 0.1 and 0.8.", placement = "top", trigger = "hover"),
+        numericInput("in_im_profile_offset_y", "Image position", min = 0.01, max = 0.40, value = 0.20, step = 0.01),
+        shinyBS::bsTooltip(id = "in_im_profile_offset_y", title = "Distance of profile image from top edge. Value between 0.01 and 0.2.", placement = "top", trigger = "hover"),
+        numericInput("in_nudge_x", "Image nudge x", min = -100, max = 100, value = 0, step = 1),
+        shinyBS::bsTooltip(id = "in_nudge_x", title = "Horizontal adjustment for profile image inside circular mask. Relevant for landscape images. Value between -100 and 100.", placement = "top", trigger = "hover"),
+        numericInput("in_nudge_y", "Image nudge y", min = -100, max = 100, value = 0, step = 1),
+        shinyBS::bsTooltip(id = "in_nudge_y", title = "Vertical adjustment for profile image inside circular mask. Relevant for portrait images. Value between -100 and 100.", placement = "top", trigger = "hover"),
+        actionButton("btn_update", "Update"),
+        downloadButton("btn_download", "Download"),
+        shinyBS::bsTooltip(id = "btn_download", title = "Print on A4 paper at 105% scaling and fold in half.", placement = "right", trigger = "hover"),
+        card_footer(
           div(style = "font-size:0.8em;", paste0(format(Sys.time(), "%Y"), " • Roy Francis • Version: ", fn_version()))
-        ),
-        column(
-          6,
-          div(
-            class = "img-output",
-            imageOutput("out_plot", width = "auto", height = "auto")
-          )
         )
+      ),
+      div(
+        class = "img-output",
+        imageOutput("out_plot", width = "auto", height = "auto")
       )
     )
   )
@@ -89,7 +54,6 @@ ui <- fluidPage(
 # SERVER -----------------------------------------------------------------------
 
 server <- function(input, output, session) {
-
   ## get temporary directory
   store <- reactiveValues(epath = tempdir())
 
@@ -97,7 +61,6 @@ server <- function(input, output, session) {
   ## function to get plot params
 
   fn_params <- eventReactive(input$btn_update, {
-
     # if values are available, use them, else use defaults
     if (is.null(input$in_text_name)) {
       text_name <- "John Doe"

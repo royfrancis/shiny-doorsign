@@ -9,7 +9,7 @@ library(magick)
 library(png)
 library(shiny)
 library(shinyBS)
-library(shinythemes)
+library(bslib)
 library(showtext)
 
 if (!"gfont" %in% sysfonts::font_families()) sysfonts::font_add_google("Merriweather", "gfont")
