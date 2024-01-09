@@ -39,10 +39,79 @@ fn_validate <- function(input, message1, message2, message3) {
   }
 }
 
-txt_content <- c("
-**Bioinformatician, NBIS** \\
+fn_validate_range <- function(value, min, max, label = NULL) {
+  if (!is.numeric(value)) {
+    return(paste0("The input '", label, "' must be a number."))
+  } else{
+    if (value < min || value > max) {
+      return(paste0("The input '", label, "' must be between ", min, " and ", max, "."))
+    }else{
+      NULL
+    }
+  }
+}
+
+# validate image input
+fn_validate_im <- function(x) {
+  if (!is.null(x)) {
+    y <- tolower(sub("^.+[.]", "", basename(x$datapath)))
+    if (!y %in% c("jpg", "png", "jpeg", "gif")) {
+      return("Image must be one of JPG/JPEG, PNG or GIF formats.")
+    }
+    if ((x$size / 1024 / 1024) > 1) {
+      return("Image must be less than 1MB in size.")
+    }
+  }
+}
+
+sample_data_1 <- list(
+  "person-1" = list(
+    "name" = "Ingrid Bergqvist",
+    "content" = 
+"**Manager, NBIS** \\
 Dept. of Cell and Molecular Biology (ICM) \\
 Uppsala University \\
-john.doe@nbis.se \\
-0862634824
-")
+ingrid.bergqvist@nbis.se \\
+0862634824"
+  )
+)
+
+sample_data_5 <- list(
+  "person-1" = list(
+    "name" = "Jimmy Bodin",
+    "content" = 
+"**Systems Developer, NBIS** \\
+Dept. of Cell and Molecular Biology (ICM) \\
+jimmy.bodin@nbis.se"
+  ),
+    "person-2" = list(
+    "name" = "Sonja Andersson",
+    "content" = 
+"**Bioinformatician, NBIS** \\
+Dept. of Med. Biochem & Microb (IMBIM) \\
+sonja.andersson@nbis.se"
+  ),
+    "person-3" = list(
+    "name" = "Fredrik Holmberg",
+    "content" = 
+"**Bioinformatician, NBIS** \\
+Dept. of Med. Biochem & Microb (IMBIM) \\
+fredrik.holmberg@nbis.se"
+  ),
+    "person-4" = list(
+    "name" = "Ellinor Berglund",
+    "content" = 
+"**Bioinformatician, NBIS** \\
+Dept. of Imm., Genetics & Pathology (IGP) \\
+ellinor.berglund@nbis.se"
+  ),
+    "person-5" = list(
+    "name" = "Inga Magnusson",
+    "content" = 
+"**Bioinformatician, NBIS** \\
+Dept. of Imm., Genetics & Pathology (IGP) \\
+inga.magnusson@nbis.se"
+  )
+)
+
+fname <- function() return(paste0("door-sign-",fn_version(),".pdf"))

@@ -16,6 +16,10 @@
   person-1-content: none,
   person-1-profile: none,
 
+  person-2-name: none,
+  person-2-content: none,
+  person-2-profile: none,
+
   body
 
 ) = {
@@ -46,9 +50,12 @@
   )
   // page body
   pad(top: gap-above-profile,
-    stack(dir: ttb, spacing: 1em,
+    stack(dir: ttb, spacing: 1.5em,
 
-      // profile image
+    stack(
+      dir: ttb,
+      spacing: 1em,
+            // profile image
       if person-1-profile != none {
         pad(bottom: gap-below-profile,
           box(clip: true, stroke: 0pt, radius: profile-height,
@@ -63,6 +70,27 @@
 
       // content
       text(size: 1em, tracking: 0.5pt, person-1-content)
+    ),
+
+    stack(
+      dir: ttb,
+      spacing: 1em,
+      // profile image
+      if person-2-profile != none {
+        pad(bottom: gap-below-profile,
+          box(clip: true, stroke: 0pt, radius: profile-height,
+            width: profile-height, height: profile-height,
+            image(person-2-profile, height: profile-height)
+          )
+        )
+      },
+
+      // name
+      text(size: 1.4em, tracking: 1pt, weight: 600, person-2-name),
+
+      // content
+      text(size: 1em, tracking: 0.5pt, person-2-content)
+    )
     )
   )
 

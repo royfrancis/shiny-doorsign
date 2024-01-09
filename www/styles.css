@@ -1,5 +1,10 @@
 /* shiny-doorsign custom styles */
 
+.card.bslib-card {
+  height: calc(100vh - (calc(var(--bs-gutter-x) * .5))*2);
+  margin: calc(var(--bs-gutter-x) * .5) 0;
+}
+
 .bslib-sidebar-layout>.sidebar>.sidebar-content {
   padding: 1em;
   padding-top: 2em;
@@ -23,6 +28,11 @@ label.control-label {
 hr {
   color: gray;
   margin: 0.8rem 0;
+}
+
+#out_pdf {
+  height: 100%;
+  overflow: hidden;
 }
 
 .form-control {
@@ -52,7 +62,7 @@ hr {
 }
 
 .accordion-body {
-  padding-top: 0.1em;
+  padding-top: 0.2em;
 }
 
 button.accordion-button {
@@ -65,5 +75,5 @@ button.accordion-button {
 }
 
 .accordion {
-  margin: 1em 0;
+  margin: 0.4em 0;
 }

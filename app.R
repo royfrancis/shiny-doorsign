@@ -10,11 +10,12 @@ source("functions.R")
 
 # UI ---------------------------------------------------------------------------
 
-ui <- page_fluid(style="margin-top:1em;",
+ui <- page_fluid(
   title = "NBIS Doorsign",
   theme = bs_theme(preset = "zephyr", primary = "#A7C947"),
   tags$head(tags$link(rel = "stylesheet", type = "text/css", href = "styles.css")),
   card(
+    full_screen = TRUE,
     card_header(
       class = "app-card-header",
       tags$div(
@@ -26,44 +27,47 @@ ui <- page_fluid(style="margin-top:1em;",
     ),
     layout_sidebar(
       sidebar = sidebar(
-        width="300px",
-        sliderInput("in_tracks", "Number of persons", min = 1, max = 5, value = 1, step = 1),
+        width="320px",
+        sliderInput("in_tracks", "Number of persons", min = 1, max = 5, step = 1, value = 1),
         uiOutput("tracks"),
-        layout_columns(
-          tooltip(
-            numericInput("in_height", "Image height", min = 1, max = 10, value = 6, step = 0.5),
-            "Height of profile image. Value between 1 and 10.", placement = "right"
-          ),
-          tooltip(
-            numericInput("in_size", "Font size", min = 5, max = 20, value = 14, step = 1),
-            "Base font size. Value between 5 and 20.", placement = "right"
-          ),
-            col_width = c(6, 6)
-        ),
-        layout_columns(style="margin-bottom: 0.6em",
-          tooltip(
-            numericInput("in_gap_above", "Upper gap", min = 0, max = 5, value = 2, step = 0.1),
-            "Gap above profile image. Value between 0 and 5.", placement = "right"
-          ),
-          tooltip(
-            numericInput("in_gap_below", "Lower gap", min = 0, max = 5, value = 0.5, step = 0.1),
-            "Gap below profile image. Value between 0 and 5.", placement = "right"
-          ),
-            col_width = c(6, 6)
+        div(
+          accordion(open = FALSE,
+            accordion_panel("Settings", icon = bsicons::bs_icon("gear-fill"),
+              layout_columns(
+              tooltip(
+                numericInput("in_height", "Image height", min = 1, max = 10, step = 0.5, value = 6),
+                "Height of profile image. Value between 1 and 10.", placement = "right"
+              ),
+              tooltip(
+                numericInput("in_size", "Font size", min = 5, max = 20, step = 1, value = 16),
+                "Base font size. Value between 5 and 20.", placement = "right"
+              ),
+                col_width = c(6, 6)
+            ),
+            layout_columns(
+              tooltip(
+                numericInput("in_gap_above", "Upper gap", min = 0, max = 3, step = 0.1, value = 2),
+                "Gap above profile image. Value between 0 and 5.", placement = "right"
+              ),
+              tooltip(
+                numericInput("in_gap_below", "Lower gap", min = 0, max = 3, step = 0.1, value = 0.6),
+                "Gap below profile image. Value between 0 and 5.", placement = "right"
+              ),
+                col_width = c(6, 6)
+              )
+            )
+          )
         ),
         tooltip(actionButton("btn_update", "Update", class = "btn-large"), "Preview changes", placement = "top"),
         layout_columns(
           style = "margin-top:5px;",
-          tooltip(actionButton("btn_reset", "Reset", class = "btn-warning"), "Reset all inputs", placement = "bottom"),
+          tooltip(actionButton("btn_reset", "Reset", class = "btn-warning"), "Reset all inputs. To reset images, refresh page", placement = "bottom"),
           tooltip(downloadButton("btn_download", "Download"), "Download as PDF", placement = "bottom"),
           col_widths = c(4, 8)
         )
       ),
-      div(
-        class = "img-output",
-        imageOutput("out_plot", width = "auto", height = "auto")
-      ),
-      verbatimTextOutput("out_text")
+      uiOutput("out_pdf", width = "100%", height = "100%")
+      #verbatimTextOutput("out_text")
     ),
     card_footer(
       class = "app-footer",
@@ -80,29 +84,31 @@ ui <- page_fluid(style="margin-top:1em;",
 
 server <- function(input, output, session) {
   ## get temporary directory
-  store <- reactiveValues(epath = tempdir())
+  store <- reactiveValues(wd = tempdir())
 
   ## UI: tracks ----------------------------------------------------------------
   ## conditional ui for tracks
 
   output$tracks <- renderUI({
     tracks <- as.integer(input$in_tracks)
+    sample_data <- sample_data_1
+    if(tracks > 1) sample_data <- sample_data_5
 
-    accordion(
+    accordion(open = FALSE,
       lapply(1:tracks, function(i) {
         accordion_panel(paste("Person",i), icon = bsicons::bs_icon("person-circle"),
           div(class="info-item",
             tooltip(
-              textInput(paste0("in_name_",i), "Name", value = "John Doe", placeholder = paste("Enter name of person",i)),
+              textInput(paste0("in_name_",i), "Name", value = sample_data[[i]][["name"]], placeholder = paste("Enter name of person",i)),
               paste("Enter name of person",i), placement = "right",
             ),
             tooltip(
-              textAreaInput(paste0("in_content_",i), "Content", value = txt_content, placeholder = paste("Enter info for person",i), height = "150px"),
+              textAreaInput(paste0("in_content_",i), "Content", value = sample_data[[i]][["content"]], placeholder = paste("Enter info for person",i), height = "100px"),
               paste("Enter info for person",i), placement = "right",
             ),
             tooltip(
               fileInput(paste0("in_image_",i), "Profile image", multiple = FALSE),
-              paste("Upload profile image for person",i), placement = "right",
+              paste("Upload profile image for person",i,". Use an image with square aspect ratio"), placement = "right",
             )
           )
         )
@@ -111,23 +117,30 @@ server <- function(input, output, session) {
 
   })
 
-  ## FN: fn_params_track ------------------------------------------------------------
-  ## function to get track input params
+  ## FN: fn_vars ------------------------------------------------------------
+  ## function to get ui input params
 
-  fn_params_track <- reactive({
+  fn_vars <- reactive({
 
+    #validate(need(input$tracks, 'Number of persons required.'))
     tracks <- as.integer(input$in_tracks)
 
     l <- setNames(
       lapply(1:tracks, function(i){
-
-        eval(parse(text = paste0("img <- input$in_image_",i)))
-        if(is.null(img)){
-          img_path <- NULL
+        
+        # handling profile images
+        eval(parse(text = paste0("cimg <- input$in_image_",i)))
+        if(is.null(cimg)){
+          img_path <- "www/profile.png"
         } else {
-         eval(parse(text = paste0("img_path <- list(path = input$in_image_",i,"$datapath)")))
+          validate(fn_validate_im(cimg))
+          ext <- tools::file_ext(cimg$datapath)
+          img_path <- paste0("profile-", i, ".", ext)
+          if (file.exists(img_path)) file.remove(img_path)
+          file.copy(cimg$datapath, img_path)
         }
 
+        # create list with person metadata
         setNames(
           list(
             eval(parse(text = paste0("input$in_name_",i))),
@@ -139,163 +152,149 @@ server <- function(input, output, session) {
       }), paste0("person-",1:tracks)
     )
 
-    return(l)
-  })
-
-  ## FN: fn_params ------------------------------------------------------------
-  ## function to get ui input params
-
-  fn_params <- reactive({
     
-    height <- input$in_height
-    size <- input$in_size
-    gap_above <- input$in_gap_above
-    gap_below <- input$in_gap_below
 
-    return(list("profile-height" = height, "font-size" = size, 
-                "gap-above-profile" = gap_above, "gap-below-profile" = gap_below,
-                fn_params_track()
-                ))
+    l["profile-height"] = paste0(ifelse(is.null(input$in_height),6,{
+      validate(fn_validate_range(input$in_height, 1, 10, label = "Image height"))
+      input$in_height
+      }),"cm")
+
+    l["font-size"] = paste0(ifelse(is.null(input$in_size),16,{
+      validate(fn_validate_range(input$in_size, 5, 20, label = "Font size"))
+      input$in_size
+      }),"pt")
+
+    l["gap-above-profile"] = paste0(ifelse(is.null(input$in_gap_above),2,{
+      validate(fn_validate_range(input$in_gap_above, 0, 3, label = "Upper gap"))
+      input$in_gap_above
+      }),"cm")
+
+    l["gap-below-profile"] = paste0(ifelse(is.null(input$in_gap_below),0.6,{
+      validate(fn_validate_range(input$in_gap_below, 0, 3, label = "Lower gap"))
+      input$in_gap_below
+      }),"cm")
+
+    l["persons"] = tracks
+
+    return(l)
   })
 
   ## ER: Update button binding -------------------------------------------------
 
   evr_update <- eventReactive(input$btn_update, {
-    return(fn_params())
+    return(fn_vars())
   })
 
-    # validation ---------------------------------------------------------------
+  ## FN: fn_vars ------------------------------------------------------------
+  ## function to get ui input params
 
-    # fn_val <- function(x) {
-    #   dp <- deparse(substitute(x))
-    #   dp <- switch(dp,
-    #     "l1x" = "Label 1 Hor pos",
-    #     "l2x" = "Label 2 Hor pos",
-    #     "l3x" = "Label 3 Hor pos",
-    #     "l1y" = "Label 1 Ver pos",
-    #     "l2y" = "Label 2 Ver pos",
-    #     "l3y" = "Label 3 Ver pos",
-    #     "lls" = "Logo left scale",
-    #     "lrs" = "Logo right scale"
-    #   )
-    #   if (x < 0 | x > 1) paste0("Input '", dp, "' must be between 0 and 1.")
-    # }
+  fn_build <- reactive({
+    vars <- evr_update()
+    #vars <- fn_vars()
 
-    # dfr ----------------------------------------------------------------------
+    file_name <- switch(vars$persons, "one.qmd", "two.qmd", "three.qmd", "four.qmd", "five.qmd")
 
-  #   dfr <- data.frame(
-  #     label = c(text_name, text_title, text_dept),
-  #     type = c("name", "title", "dept")
-  #   )
-  #   dfr1 <- data.frame(label = trimws(unlist(strsplit(text_email, ","))))
-  #   dfr1$type <- "email"
-  #   dfr2 <- data.frame(label = unlist(strsplit(text_phone, ",")))
-  #   dfr2$type <- "phone"
-  #   dfr <- rbind(dfr, dfr1, dfr2)
+    progress_plot <- shiny::Progress$new()
+    progress_plot$set(message = "Creating PDF ...", value = 0.1)
 
-  #   logo_right <- png::readPNG("www/scilifelab.png")
-  #   logo_left <- png::readPNG("www/nbis.png")
+    output_file <- fname()
+    quarto::quarto_render(input = file_name, output_file = output_file, metadata = vars)
 
-  #   fn_validate_im <- function(x) {
-  #     if (!is.null(x)) {
-  #       y <- tolower(sub("^.+[.]", "", basename(x$datapath)))
-  #       if (!y %in% c("jpg", "jpeg", "png", "gif")) {
-  #         return("Image must be one of JPG/JPEG, PNG or GIF formats.")
-  #       }
-  #       if ((x$size / 1024 / 1024) > 2) {
-  #         return("Image must be less than 2 MB in size.")
-  #       }
-  #     }
-  #   }
+    # preview path
+    ppath <- file.path(store$wd, "preview")
+    if (!dir.exists(ppath)) dir.create(ppath)
+    addResourcePath("preview", ppath)
+    if (file.exists(file.path(ppath, output_file))) file.remove(file.path(ppath, output_file))
+    file.copy(output_file, file.path(ppath, output_file))
+    file.remove(output_file)
+    # file.remove("preview.typ")
 
-  #   validate(fn_validate_im(input$in_im_profile))
+    progress_plot$set(message = "Completed", value = 1)
+    progress_plot$close()
+  })
 
-  #   if (is.null(input$in_im_profile)) {
-  #     im_profile <- png::readPNG("www/profile.png")
-  #   } else {
-  #     # read image, convert to png, square aspect, export as png
-  #     im_final <- fn_circ_image(im = magick::image_read(input$in_im_profile$datapath), nudge_x = nudge_x, nudge_y = nudge_y)
-
-  #     magick::image_write(im_final, path = file.path(store$epath, "image.png"), format = "png")
-  #     im_profile <- png::readPNG(file.path(store$epath, "image.png"))
-  #   }
-
-  #   f <- "Merriweather"
-
-  #   return(list(
-  #     dfr = dfr, logo_right = logo_right, logo_left = logo_left, im_profile = im_profile,
-  #     pos_y_text = pos_y_text, im_profile_offset_y = im_profile_offset_y, im_profile_width = im_profile_width
-  #   ))
-  # })
-
-  ## OUT: out_plot ------------------------------------------------------------
+  ## OUT: out_pdf -------------------------------------------------------------
   ## plots figure
 
-  # output$out_plot <- renderImage(
-  #   {
-  #     p <- fn_params()
-  #     progress1 <- shiny::Progress$new()
-  #     progress1$set(message = "Generating figure...", value = 40)
-
-  #     plot_doorsign(
-  #       dfr = p$dfr, im_profile = p$im_profile, logo_left = p$logo_left, logo_right = p$logo_right,
-  #       pos_y_text = p$pos_y_text, im_profile_offset_y = p$im_profile_offset_y, im_profile_width = p$im_profile_width,
-  #       path_export = store$epath, format_export = "png"
-  #     )
-  #     progress1$set(message = "Completed.", value = 100)
-  #     progress1$close()
-
-  #     scaling <- 2.8
-  #     return(list(
-  #       src = file.path(store$epath, "door-sign.png"), contentType = "image/png",
-  #       width = round(297 * scaling, 0),
-  #       height = round(210 * scaling, 0),
-  #       alt = "doorsign"
-  #     ))
-  #   },
-  #   deleteFile = TRUE
-  # )
-
-  ## FN: fn_download -----------------------------------------------------------
-  ## function to download a zipped file with images
-
-  # fn_download <- function() {
-  #   p <- fn_params()
-  #   plot_doorsign(
-  #     dfr = p$dfr, im_profile = p$im_profile, logo_left = p$logo_left, logo_right = p$logo_right,
-  #     pos_y_text = p$pos_y_text, im_profile_offset_y = p$im_profile_offset_y, im_profile_width = p$im_profile_width,
-  #     path_export = store$epath, format_export = "pdf"
-  #   )
-  # }
+  output$out_pdf <- renderUI({
+    fn_build()
+    output_file <- output_file <- fname()
+    return(tags$iframe(src = file.path("preview", output_file), height = "100%", width = "100%"))
+  })
 
   ## DHL: btn_download ---------------------------------------------------------
   ## download handler for downloading zipped file
 
-  # output$btn_download <- downloadHandler(
-  #   filename = "door-sign.pdf",
-  #   content = function(file) {
-  #     progress <- shiny::Progress$new()
-  #     progress$set(message = "Generating PDFs...", value = 45)
-  #     fn_download()
+  output$btn_download <- downloadHandler(
+    filename = fname(),
+    content = function(file) {
+      fn_build()
+      cpath <- file.path(store$wd, "preview", fname())
+      file.copy(cpath, file, overwrite = T)
+      unlink(cpath)
+    }
+  )
 
-  #     progress$set(message = "Downloading file...", value = 90)
-  #     file.copy(file.path(store$epath, "door-sign.pdf"), file, overwrite = T)
+ ## OBS: set default inputs ------------------------------------------------------------
+  ## observer for updating default inputs
 
-  #     progress$set(message = "Completed.", value = 100)
-  #     progress$close()
-  #   }
-  # )
+  observe({
+    if(input$in_tracks == 1){
+      updateNumericInput(session,"in_height", "Image height", min = 1, max = 10, step = 0.5, value = 6)
+      updateNumericInput(session,"in_size", "Font size", min = 5, max = 20, step = 1, value = 16)
+      updateNumericInput(session,"in_gap_above", "Upper gap", min = 0, max = 3, step = 0.1, value = 2)
+      updateNumericInput(session,"in_gap_below", "Lower gap", min = 0, max = 3, step = 0.1, value = 0.6)
+      # lapply(1:input$in_tracks, function(i) {
+      #   uupdateTextInput(paste0("in_name_",i), "Name", value = "John Doe", placeholder = paste("Enter name of person",i)),
+      #   updateTextAreaInput(paste0("in_content_",i), "Content", value = txt_content, placeholder = paste("Enter info for person",i), height = "150px"),
+      # })
+    }
+
+    if(input$in_tracks == 2){
+      updateNumericInput(session,"in_height", "Image height", min = 1, max = 10, step = 0.5, value = 4)
+      updateNumericInput(session,"in_size", "Font size", min = 5, max = 20, step = 1, value = 14)
+      updateNumericInput(session,"in_gap_above", "Upper gap", min = 0, max = 3, step = 0.1, value = 0.5)
+      updateNumericInput(session,"in_gap_below", "Lower gap", min = 0, max = 3, step = 0.1, value = 0.1)
+    }
+
+    if(input$in_tracks == 3){
+      updateNumericInput(session,"in_height", "Image height", min = 1, max = 10, step = 0.5, value = 3)
+      updateNumericInput(session,"in_size", "Font size", min = 5, max = 20, step = 1, value = 12)
+      updateNumericInput(session,"in_gap_above", "Upper gap", min = 0, max = 3, step = 0.1, value = 2)
+      updateNumericInput(session,"in_gap_below", "Lower gap", min = 0, max = 3, step = 0.1, value = 0.1)
+    }
+
+    if(input$in_tracks == 4){
+      updateNumericInput(session,"in_height", "Image height", min = 1, max = 10, step = 0.5, value = 3)
+      updateNumericInput(session,"in_size", "Font size", min = 5, max = 20, step = 1, value = 12)
+      updateNumericInput(session,"in_gap_above", "Upper gap", min = 0, max = 3, step = 0.1, value = 1)
+      updateNumericInput(session,"in_gap_below", "Lower gap", min = 0, max = 3, step = 0.1, value = 0.1)
+    }
+
+    if(input$in_tracks == 5){
+      updateNumericInput(session,"in_height", "Image height", min = 1, max = 10, step = 0.5, value = 2.6)
+      updateNumericInput(session,"in_size", "Font size", min = 5, max = 20, step = 1, value = 11)
+      updateNumericInput(session,"in_gap_above", "Upper gap", min = 0, max = 3, step = 0.1, value = 0.5)
+      updateNumericInput(session,"in_gap_below", "Lower gap", min = 0, max = 3, step = 0.1, value = 0.1)
+    }
+  })
+
+  ## OBS: btn_reset ------------------------------------------------------------
+  ## observer for reset
+
+  observeEvent(input$btn_reset, {
+    updateSliderInput(session, "in_tracks", "Number of persons", min = 1, max = 5, value = 1, step = 1)
+  })
 
   ## OUT: out_text ------------------------------------------------------------
   ## debug output
 
-  output$out_text <- renderPrint({
+  # output$out_text <- renderPrint({
 
-    #x <- evr_update()
-    x <- fn_params()
-    print(str(x))
+  #   x <- evr_update()
+  #   print(str(x))
 
-  })
+  # })
 
 }
 

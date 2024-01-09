@@ -4,28 +4,22 @@
 
 This is an R shiny app to create door signage for offices.
 
-![](preview.png)
+![](preview.jpg)
 
 ## Running the app
 
-### Run using docker
+### Run online
+
+Click [here](https://door-sign.serve.scilifelab.se/)
+
+### Run a docker image
 
 ```
-docker run --rm -p 8787:8787 royfrancis/shiny-doorsign:v1.2
+docker run --rm -p 8787:8787 royfrancis/shiny-doorsign
 ```
 
 The app should be available through a web browser at `http://0.0.0.0:8787`.
 
-### Run in R
-
-Install the following R packages:
-
-```
-install.packages(c(Cairo, curl, ggplot2, magick, png, shiny, shinyBS, shinythemes, showtext))
-```
-
-This repo is not an R package. In the root directory of this repo, run app using `shiny::runApp("app.R")`.
-
 ---
 
-2022 • Roy Francis
+2024 • Roy Francis
