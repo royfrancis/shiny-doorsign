@@ -13,7 +13,7 @@ RUN apt-get update \
     && rm -rf ./quarto-linux-amd64.deb \
     rm -rf /var/lib/apt/lists/*
 
-RUN Rscript -e 'install.packages(c("markdown","remotes","shiny","bsicons"))' \
+RUN Rscript -e 'install.packages(c("markdown","remotes","bsicons"))' \
     && Rscript -e 'remotes::install_github("rstudio/bslib");remotes::install_github("quarto-dev/quarto-r")'
 
 RUN mkdir /srv/shiny-server/app

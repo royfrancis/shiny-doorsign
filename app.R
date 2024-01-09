@@ -260,7 +260,7 @@ server <- function(input, output, session) {
     if(input$in_tracks == 3){
       updateNumericInput(session,"in_height", "Image height", min = 1, max = 10, step = 0.5, value = 3)
       updateNumericInput(session,"in_size", "Font size", min = 5, max = 20, step = 1, value = 12)
-      updateNumericInput(session,"in_gap_above", "Upper gap", min = 0, max = 3, step = 0.1, value = 2)
+      updateNumericInput(session,"in_gap_above", "Upper gap", min = 0, max = 3, step = 0.1, value = 1)
       updateNumericInput(session,"in_gap_below", "Lower gap", min = 0, max = 3, step = 0.1, value = 0.1)
     }
 
