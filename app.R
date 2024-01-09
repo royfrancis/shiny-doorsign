@@ -29,6 +29,28 @@ ui <- page_fluid(style="margin-top:1em;",
         width="300px",
         sliderInput("in_tracks", "Number of persons", min = 1, max = 5, value = 1, step = 1),
         uiOutput("tracks"),
+        layout_columns(
+          tooltip(
+            numericInput("in_height", "Image height", min = 1, max = 10, value = 6, step = 0.5),
+            "Height of profile image. Value between 1 and 10.", placement = "right"
+          ),
+          tooltip(
+            numericInput("in_size", "Font size", min = 5, max = 20, value = 14, step = 1),
+            "Base font size. Value between 5 and 20.", placement = "right"
+          ),
+            col_width = c(6, 6)
+        ),
+        layout_columns(style="margin-bottom: 0.6em",
+          tooltip(
+            numericInput("in_gap_above", "Upper gap", min = 0, max = 5, value = 2, step = 0.1),
+            "Gap above profile image. Value between 0 and 5.", placement = "right"
+          ),
+          tooltip(
+            numericInput("in_gap_below", "Lower gap", min = 0, max = 5, value = 0.5, step = 0.1),
+            "Gap below profile image. Value between 0 and 5.", placement = "right"
+          ),
+            col_width = c(6, 6)
+        ),
         tooltip(actionButton("btn_update", "Update", class = "btn-large"), "Preview changes", placement = "top"),
         layout_columns(
           style = "margin-top:5px;",
@@ -71,16 +93,16 @@ server <- function(input, output, session) {
         accordion_panel(paste("Person",i), icon = bsicons::bs_icon("person-circle"),
           div(class="info-item",
             tooltip(
+              textInput(paste0("in_name_",i), "Name", value = "John Doe", placeholder = paste("Enter name of person",i)),
+              paste("Enter name of person",i), placement = "right",
+            ),
+            tooltip(
               textAreaInput(paste0("in_content_",i), "Content", value = txt_content, placeholder = paste("Enter info for person",i), height = "150px"),
               paste("Enter info for person",i), placement = "right",
             ),
             tooltip(
               fileInput(paste0("in_image_",i), "Profile image", multiple = FALSE),
               paste("Upload profile image for person",i), placement = "right",
-            ),
-            tooltip(
-              numericInput(paste0("in_size_",i), "Image height", min = 0.10, max = 0.80, value = 0.40, step = 0.01),
-              paste("Width of profile image for person",i,". Value between 0.1 and 0.8."), placement = "right"
             )
           )
         )
@@ -89,10 +111,10 @@ server <- function(input, output, session) {
 
   })
 
-  ## FN: fn_params ------------------------------------------------------------
-  ## function to get ui input params
+  ## FN: fn_params_track ------------------------------------------------------------
+  ## function to get track input params
 
-  fn_params <- reactive({
+  fn_params_track <- reactive({
 
     tracks <- as.integer(input$in_tracks)
 
@@ -108,16 +130,32 @@ server <- function(input, output, session) {
 
         setNames(
           list(
-            img_path,
-            eval(parse(text = paste0("input$in_size_",i))),
-            eval(parse(text = paste0("input$in_content_",i)))
-          ), c("image", "size", "content")
+            eval(parse(text = paste0("input$in_name_",i))),
+            eval(parse(text = paste0("input$in_content_",i))),
+            img_path
+          ), c("name", "content", "profile")
         )
 
       }), paste0("person-",1:tracks)
     )
 
     return(l)
+  })
+
+  ## FN: fn_params ------------------------------------------------------------
+  ## function to get ui input params
+
+  fn_params <- reactive({
+    
+    height <- input$in_height
+    size <- input$in_size
+    gap_above <- input$in_gap_above
+    gap_below <- input$in_gap_below
+
+    return(list("profile-height" = height, "font-size" = size, 
+                "gap-above-profile" = gap_above, "gap-below-profile" = gap_below,
+                fn_params_track()
+                ))
   })
 
   ## ER: Update button binding -------------------------------------------------
@@ -253,8 +291,8 @@ server <- function(input, output, session) {
 
   output$out_text <- renderPrint({
 
-    x <- evr_update()
-    # x <- fn_params()
+    #x <- evr_update()
+    x <- fn_params()
     print(str(x))
 
   })

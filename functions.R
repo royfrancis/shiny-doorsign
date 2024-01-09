@@ -40,8 +40,7 @@ fn_validate <- function(input, message1, message2, message3) {
 }
 
 txt_content <- c("
-**John Doe** \\
-Bioinformatician, NBIS \\
+**Bioinformatician, NBIS** \\
 Dept. of Cell and Molecular Biology (ICM) \\
 Uppsala University \\
 john.doe@nbis.se \\

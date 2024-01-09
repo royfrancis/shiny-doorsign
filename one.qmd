@@ -1,0 +1,24 @@
+---
+logo-left:
+  path: "www/nbis.png"
+logo-right:
+  path: "www/scilifelab.png"
+profile-height: 6cm
+gap-above-profile: 2cm
+gap-below-profile: 0.5cm
+font-size: 16pt
+person-1:
+  name: "Johan Viklund"
+  content: |
+    **Chief Technical Officer, NBIS** \
+    Dept. of Cell and Molecular Biology (ICM) \
+    Uppsala University \
+    johan.viklund@nbis.se \
+    0739638928
+  profile:
+    path: "www/profile.png"
+format:
+  door-sign-one-typst:
+    keep-typ: false
+    font-paths: fonts
+---
