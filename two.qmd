@@ -1,0 +1,26 @@
+---
+logo-left: "www/nbis.png"
+logo-right: "www/scilifelab.png"
+# profile-height: 4cm
+# gap-above-profile: 0.5cm
+# gap-below-profile: 0.1cm
+# font-size: 14pt
+# person-1:
+#   name: "Anders Larsson"
+#   content: |
+#     **Systems Developer, NBIS** \
+#     Dept. of Cell and Molecular Biology (ICM) \
+#     anders.larsson@nbis.se \
+#   profile: "www/profile.png"
+# person-2:
+#   name: "Roy Francis"
+#   content: |
+#     **Bioinformatician, NBIS** \
+#     Dept. of Med. Biochem & Microb (IMBIM) \
+#     roy.francis@nbis.se \
+#   profile: "www/profile.png"
+format:
+  door-sign-two-typst:
+    keep-typ: false
+    font-paths: fonts
+---

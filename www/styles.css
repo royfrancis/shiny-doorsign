@@ -1,71 +1,79 @@
-/* custom css styles */
+/* shiny-doorsign custom styles */
 
-.progress > #in_img_profile_progress {
-  margin-bottom:0;
+.card.bslib-card {
+  height: calc(100vh - (calc(var(--bs-gutter-x) * .5))*2);
+  margin: calc(var(--bs-gutter-x) * .5) 0;
 }
 
-.progress {
-  margin-bottom:0;
+.bslib-sidebar-layout>.sidebar>.sidebar-content {
+  padding: 1em;
+  padding-top: 2em;
+  gap: 6px;
 }
 
 .form-group {
-  margin-bottom:5px;
+  margin-bottom: 0;
+}
+
+.shiny-input-container .control-label {
+  margin-bottom: 0;
+}
+
+label.control-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  margin-left: 0.3rem;
+}
+
+hr {
+  color: gray;
+  margin: 0.8rem 0;
+}
+
+#out_pdf {
+  height: 100%;
+  overflow: hidden;
+}
+
+.form-control {
+  font-size: 0.8rem;
 }
 
 .help-note {
-  font-size: 0.9em;
+  font-size: 0.7rem;
   color: #C0C0C0;
-  padding: 6px;
-  border-radius: 3px;
 }
 
-.help-note-yellow {
-  font-size: 0.9em;
-  color: #8a6d3b;
-  background-color: #fcf8e3;
-  border-color: #faebcc;
-  padding: 6px;
-  margin-bottom: 3px;
-  border-radius: 3px;
+.app-header {
+  padding: 1em;
+  background-image: url("banner.png");
+  background-repeat: no-repeat;
+  background-position: right;
+  background-size: cover;
 }
 
-.img-output {
-  -webkit-box-shadow: 1px 1px 6px #E0E0E0;
-  -moz-box-shadow: 1px 1px 6px #E0E0E0;
-  box-shadow: 1px 1px 6px #E0E0E0;
-  display: inline-block;
+.app-card-header {
+  padding: 0;
 }
 
-.box-left {
-  max-width: 320px;
-  border: 1px solid #dddde5;
-  border-radius: 6px;
-  padding-bottom: 15px;
-  margin-bottom: 24px;
-  background-color: #ecf0f1;
-  transition: .1s;
-  -webkit-box-shadow: 1px 1px 6px #E0E0E0;
-  -moz-box-shadow: 1px 1px 6px #E0E0E0;
-  box-shadow: 1px 1px 6px #E0E0E0;
+.app-footer {
+  background-color: #FFFFFF;
+  padding: 0.5em;
 }
 
-.box-right {
-  max-width: 450px;
-  min-width: 400px;
-  padding-top: 15px;
-  padding-bottom: 15px;
-  border-radius: 8px;
+.accordion-body {
+  padding-top: 0.2em;
 }
 
-.form-control:focus {
-  border-color: #95a5a6;
+button.accordion-button {
+  font-size: 0.9rem;
+  padding: 0.8rem;
 }
 
-@media all and (min-width: 768px) {
-  .no-pad-right {
-    padding-right: 7.5px;
-  }
-  .no-pad-left {
-    padding-left: 7.5px;
-  }
+.accordion .accordion-icon {
+  margin-right: 0.5rem !important;
+}
+
+.accordion {
+  margin: 0.4em 0;
 }

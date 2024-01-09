@@ -1,0 +1,47 @@
+---
+logo-left: "www/nbis.png"
+logo-right: "www/scilifelab.png"
+# profile-height: 2.6cm
+# gap-above-profile: 0.5cm
+# gap-below-profile: 0.1cm
+# font-size: 11pt
+# person-1:
+#   name: "Jimmy Bodin"
+#   content: |
+#     **Systems Developer, NBIS** \
+#     Dept. of Cell and Molecular Biology (ICM) \
+#     jimmy.bodin@nbis.se \
+#   profile: "www/profile.png"
+# person-2:
+#   name: "Sonja Andersson"
+#   content: |
+#     **Bioinformatician, NBIS** \
+#     Dept. of Med. Biochem & Microb (IMBIM) \
+#     sonja.andersson@nbis.se \
+#   profile: "www/profile.png"
+# person-3:
+#   name: "Fredrik Holmberg"
+#   content: |
+#     **Bioinformatician, NBIS** \
+#     Dept. of Med. Biochem & Microb (IMBIM) \
+#     fredrik.holmberg@nbis.se \
+#   profile: "www/profile.png"
+# person-4:
+#   name: "Ellinor Berglund"
+#   content: |
+#     **Bioinformatician, NBIS** \
+#     Dept. of Imm., Genetics & Pathology (IGP) \
+#     ellinor.berglund@nbis.se \
+#   profile: "www/profile.png"
+# person-5:
+#   name: "Inga Magnusson"
+#   content: |
+#     **Bioinformatician, NBIS** \
+#     Dept. of Imm., Genetics & Pathology (IGP) \
+#     inga.magnusson@nbis.se \
+#   profile: "www/profile.png"
+format:
+  door-sign-five-typst:
+    keep-typ: false
+    font-paths: fonts
+---

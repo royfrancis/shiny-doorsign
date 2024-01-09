@@ -1,86 +1,80 @@
 ## doorsign
 ## R shinyapp to generate door signs
-## 2022 Roy Mathew Francis
+## 2024 Roy Mathew Francis
+
+library(shiny)
+library(bslib)
+library(bsicons)
 
 source("functions.R")
 
 # UI ---------------------------------------------------------------------------
 
-ui <- fluidPage(
-  theme = shinytheme("flatly"),
+ui <- page_fluid(
+  title = "NBIS Doorsign",
+  theme = bs_theme(preset = "zephyr", primary = "#A7C947"),
   tags$head(tags$link(rel = "stylesheet", type = "text/css", href = "styles.css")),
-  fixedRow(
-    column(12,
-      style = "margin:15px;",
-      fluidRow(
-        style = "margin-bottom:10px;",
+  card(
+    full_screen = TRUE,
+    card_header(
+      class = "app-card-header",
+      tags$div(
+        class = "app-header",
         span(tags$img(src = "nbis.png", style = "height:18px;"), style = "vertical-align:top;display:inline-block;"),
-        span(tags$h4("•", style = "margin:0px;margin-left:6px;margin-right:6px;"), style = "vertical-align:top;display:inline-block;"),
-        span(tags$h4(strong("Door Sign"), style = "margin:0px;"), style = "vertical-align:middle;display:inline-block;")
-      ),
-      fixedRow(
-        column(3,
-          style = "max-width:330px;background:#ebedef;padding-top:15px;padding-bottom:15px;border-radius:4px;",
-          fluidRow(
-            column(12,
-              style = "margin-bottom:10px;",
-              textInput("in_text_name", NULL, value = "John Doe", placeholder = "Name"),
-              textInput("in_text_title", NULL, value = "Bioinformatician; NBIS", placeholder = "Job title"),
-              textInput("in_text_dept", NULL, value = "Dept. of Cell and Molecular Biology (ICM)", placeholder = "Department"),
-              textInput("in_text_email", NULL, value = "john.doe@nbis.se,john.doe@scilifelab.se", placeholder = "Email(s)"),
-              shinyBS::bsTooltip(id = "in_text_email", title = "Enter multiple emails using comma (,).", placement = "top", trigger = "hover"),
-              textInput("in_text_phone", NULL, value = "0730000000", placeholder = "Phone"),
-              shinyBS::bsTooltip(id = "in_text_phone", title = "Enter multiple phone numbers using comma (,).", placement = "top", trigger = "hover")
-              # HTML('<div class="help-note"><i class="fas fa-info-circle"></i>  Enter multiple email/phone using comma (,).</div>')
-            )
-          ),
-          sliderInput("in_pos_y_text", "Text vertical position", min = 0.10, max = 0.90, value = 0.56, step = 0.01),
-          fluidRow(
-            column(12,
-              style = "margin-top:15px;",
-              fileInput("in_im_profile", "Profile image", multiple = FALSE)
-            )
-          ),
-          fluidRow(
-            column(6,
-              class = "no-pad-right",
-              numericInput("in_im_profile_width", "Image size", min = 0.10, max = 0.80, value = 0.40, step = 0.01),
-              shinyBS::bsTooltip(id = "in_im_profile_width", title = "Width of profile image. Value between 0.1 and 0.8.", placement = "top", trigger = "hover")
+        span(tags$h5("•", style = "margin:0px;margin-left:6px;margin-right:6px;"), style = "vertical-align:top;display:inline-block;"),
+        span(tags$h5("Doorsign", style = "margin:0px;"), style = "vertical-align:middle;display:inline-block;")
+      )
+    ),
+    layout_sidebar(
+      sidebar = sidebar(
+        width="320px",
+        sliderInput("in_tracks", "Number of persons", min = 1, max = 5, step = 1, value = 1),
+        uiOutput("tracks"),
+        div(
+          accordion(open = FALSE,
+            accordion_panel("Settings", icon = bsicons::bs_icon("gear-fill"),
+              layout_columns(
+              tooltip(
+                numericInput("in_height", "Image height", min = 1, max = 10, step = 0.5, value = 6),
+                "Height of profile image. Value between 1 and 10.", placement = "right"
+              ),
+              tooltip(
+                numericInput("in_size", "Font size", min = 5, max = 20, step = 1, value = 16),
+                "Base font size. Value between 5 and 20.", placement = "right"
+              ),
+                col_width = c(6, 6)
             ),
-            column(6,
-              class = "no-pad-left",
-              numericInput("in_im_profile_offset_y", "Image position", min = 0.01, max = 0.40, value = 0.20, step = 0.01),
-              shinyBS::bsTooltip(id = "in_im_profile_offset_y", title = "Distance of profile image from top edge. Value between 0.01 and 0.2.", placement = "top", trigger = "hover")
+            layout_columns(
+              tooltip(
+                numericInput("in_gap_above", "Upper gap", min = 0, max = 3, step = 0.1, value = 2),
+                "Gap above profile image. Value between 0 and 5.", placement = "right"
+              ),
+              tooltip(
+                numericInput("in_gap_below", "Lower gap", min = 0, max = 3, step = 0.1, value = 0.6),
+                "Gap below profile image. Value between 0 and 5.", placement = "right"
+              ),
+                col_width = c(6, 6)
+              )
             )
-          ),
-          fluidRow(
-            style = "margin-bottom:15px;margin-top:5px;",
-            column(6,
-              class = "no-pad-right",
-              numericInput("in_nudge_x", "Image nudge x", min = -100, max = 100, value = 0, step = 1),
-              shinyBS::bsTooltip(id = "in_nudge_x", title = "Horizontal adjustment for profile image inside circular mask. Relevant for landscape images. Value between -100 and 100.", placement = "top", trigger = "hover")
-            ),
-            column(6,
-              class = "no-pad-left",
-              numericInput("in_nudge_y", "Image nudge y", min = -100, max = 100, value = 0, step = 1),
-              shinyBS::bsTooltip(id = "in_nudge_y", title = "Vertical adjustment for profile image inside circular mask. Relevant for portrait images. Value between -100 and 100.", placement = "top", trigger = "hover")
-            )
-          ),
-          div(
-            style = "margin-top:25px;margin-bottom:25px;",
-            actionButton("btn_update", "Update"),
-            downloadButton("btn_download", "Download"),
-            shinyBS::bsTooltip(id = "btn_download", title = "Print on A4 paper at 105% scaling and fold in half.", placement = "right", trigger = "hover")
-          ),
-          div(style = "font-size:0.8em;", paste0(format(Sys.time(), "%Y"), " • Roy Francis • Version: ", fn_version()))
-        ),
-        column(
-          6,
-          div(
-            class = "img-output",
-            imageOutput("out_plot", width = "auto", height = "auto")
           )
+        ),
+        tooltip(actionButton("btn_update", "Update", class = "btn-large"), "Preview changes", placement = "top"),
+        layout_columns(
+          style = "margin-top:5px;",
+          tooltip(actionButton("btn_reset", "Reset", class = "btn-warning"), "Reset all inputs. To reset images, refresh page", placement = "bottom"),
+          tooltip(downloadButton("btn_download", "Download"), "Download as PDF", placement = "bottom"),
+          col_widths = c(4, 8)
         )
+      ),
+      uiOutput("out_pdf", width = "100%", height = "100%")
+      #verbatimTextOutput("out_text")
+    ),
+    card_footer(
+      class = "app-footer",
+      div(
+        class = "help-note",
+        paste0(format(Sys.time(), "%Y"), " Roy Francis • Version: ", fn_version()),
+        HTML("• <a href='https://github.com/royfrancis/shiny-doorsign' target='_blank'><i class='fab fa-github'></i></a> • <a href='mailto:roy.francis@nbis.se' target='_blank'><i class='fa fa-envelope'></i></a>")
       )
     )
   )
@@ -89,200 +83,219 @@ ui <- fluidPage(
 # SERVER -----------------------------------------------------------------------
 
 server <- function(input, output, session) {
-
   ## get temporary directory
-  store <- reactiveValues(epath = tempdir())
+  store <- reactiveValues(wd = tempdir())
 
-  ## FN: fn_params ------------------------------------------------------------
-  ## function to get plot params
+  ## UI: tracks ----------------------------------------------------------------
+  ## conditional ui for tracks
 
-  fn_params <- eventReactive(input$btn_update, {
+  output$tracks <- renderUI({
+    tracks <- as.integer(input$in_tracks)
+    sample_data <- sample_data_1
+    if(tracks > 1) sample_data <- sample_data_5
 
-    # if values are available, use them, else use defaults
-    if (is.null(input$in_text_name)) {
-      text_name <- "John Doe"
-    } else {
-      text_name <- input$in_text_name
-    }
-    if (is.null(input$in_text_title)) {
-      text_title <- "Bioinformatician; NBIS"
-    } else {
-      text_title <- input$in_text_title
-    }
-    if (is.null(input$in_text_dept)) {
-      text_dept <- "Dept. of Cell and Molecular Biology (ICM)"
-    } else {
-      text_dept <- input$in_text_dept
-    }
-    if (is.null(input$in_text_email)) {
-      text_email <- "john.doe@nbis.se"
-    } else {
-      text_email <- input$in_text_email
-    }
-    if (is.null(input$in_text_phone)) {
-      text_phone <- "0730000000"
-    } else {
-      text_phone <- input$in_text_phone
-    }
-
-    if (is.null(input$in_pos_x)) {
-      pos_x <- 0.12
-    } else {
-      pos_x <- input$in_pos_x
-    }
-    if (is.null(input$in_pos_y_text)) {
-      pos_y_text <- 0.56
-    } else {
-      pos_y_text <- input$in_pos_y_text
-    }
-    if (is.null(input$in_line_spacing)) {
-      line_spacing <- 0.042
-    } else {
-      line_spacing <- input$in_line_spacing
-    }
-    if (is.null(input$in_im_profile_width)) {
-      im_profile_width <- 0.4
-    } else {
-      im_profile_width <- input$in_im_profile_width
-    }
-    if (is.null(input$in_im_profile_offset_y)) {
-      im_profile_offset_y <- 0.20
-    } else {
-      im_profile_offset_y <- input$in_im_profile_offset_y
-    }
-
-    if (is.null(input$in_nudge_x)) {
-      nudge_x <- 0
-    } else {
-      nudge_x <- input$in_nudge_x
-    }
-    if (is.null(input$in_nudge_y)) {
-      nudge_y <- 0
-    } else {
-      nudge_y <- input$in_nudge_y
-    }
-
-    # validation ---------------------------------------------------------------
-
-    fn_val <- function(x) {
-      dp <- deparse(substitute(x))
-      dp <- switch(dp,
-        "l1x" = "Label 1 Hor pos",
-        "l2x" = "Label 2 Hor pos",
-        "l3x" = "Label 3 Hor pos",
-        "l1y" = "Label 1 Ver pos",
-        "l2y" = "Label 2 Ver pos",
-        "l3y" = "Label 3 Ver pos",
-        "lls" = "Logo left scale",
-        "lrs" = "Logo right scale"
-      )
-      if (x < 0 | x > 1) paste0("Input '", dp, "' must be between 0 and 1.")
-    }
-
-    # dfr ----------------------------------------------------------------------
-
-    dfr <- data.frame(
-      label = c(text_name, text_title, text_dept),
-      type = c("name", "title", "dept")
+    accordion(open = FALSE,
+      lapply(1:tracks, function(i) {
+        accordion_panel(paste("Person",i), icon = bsicons::bs_icon("person-circle"),
+          div(class="info-item",
+            tooltip(
+              textInput(paste0("in_name_",i), "Name", value = sample_data[[i]][["name"]], placeholder = paste("Enter name of person",i)),
+              paste("Enter name of person",i), placement = "right",
+            ),
+            tooltip(
+              textAreaInput(paste0("in_content_",i), "Content", value = sample_data[[i]][["content"]], placeholder = paste("Enter info for person",i), height = "100px"),
+              paste("Enter info for person",i), placement = "right",
+            ),
+            tooltip(
+              fileInput(paste0("in_image_",i), "Profile image", multiple = FALSE),
+              paste("Upload profile image for person",i,". Use an image with square aspect ratio"), placement = "right",
+            )
+          )
+        )
+      })
     )
-    dfr1 <- data.frame(label = trimws(unlist(strsplit(text_email, ","))))
-    dfr1$type <- "email"
-    dfr2 <- data.frame(label = unlist(strsplit(text_phone, ",")))
-    dfr2$type <- "phone"
-    dfr <- rbind(dfr, dfr1, dfr2)
 
-    logo_right <- png::readPNG("www/scilifelab.png")
-    logo_left <- png::readPNG("www/nbis.png")
-
-    fn_validate_im <- function(x) {
-      if (!is.null(x)) {
-        y <- tolower(sub("^.+[.]", "", basename(x$datapath)))
-        if (!y %in% c("jpg", "jpeg", "png", "gif")) {
-          return("Image must be one of JPG/JPEG, PNG or GIF formats.")
-        }
-        if ((x$size / 1024 / 1024) > 2) {
-          return("Image must be less than 2 MB in size.")
-        }
-      }
-    }
-
-    validate(fn_validate_im(input$in_im_profile))
-
-    if (is.null(input$in_im_profile)) {
-      im_profile <- png::readPNG("www/profile.png")
-    } else {
-      # read image, convert to png, square aspect, export as png
-      im_final <- fn_circ_image(im = magick::image_read(input$in_im_profile$datapath), nudge_x = nudge_x, nudge_y = nudge_y)
-
-      magick::image_write(im_final, path = file.path(store$epath, "image.png"), format = "png")
-      im_profile <- png::readPNG(file.path(store$epath, "image.png"))
-    }
-
-    f <- "Merriweather"
-
-    return(list(
-      dfr = dfr, logo_right = logo_right, logo_left = logo_left, im_profile = im_profile,
-      pos_y_text = pos_y_text, im_profile_offset_y = im_profile_offset_y, im_profile_width = im_profile_width
-    ))
   })
 
-  ## OUT: out_plot ------------------------------------------------------------
+  ## FN: fn_vars ------------------------------------------------------------
+  ## function to get ui input params
+
+  fn_vars <- reactive({
+
+    #validate(need(input$tracks, 'Number of persons required.'))
+    tracks <- as.integer(input$in_tracks)
+
+    l <- setNames(
+      lapply(1:tracks, function(i){
+        
+        # handling profile images
+        eval(parse(text = paste0("cimg <- input$in_image_",i)))
+        if(is.null(cimg)){
+          img_path <- "www/profile.png"
+        } else {
+          validate(fn_validate_im(cimg))
+          ext <- tools::file_ext(cimg$datapath)
+          img_path <- paste0("profile-", i, ".", ext)
+          if (file.exists(img_path)) file.remove(img_path)
+          file.copy(cimg$datapath, img_path)
+        }
+
+        # create list with person metadata
+        setNames(
+          list(
+            eval(parse(text = paste0("input$in_name_",i))),
+            eval(parse(text = paste0("input$in_content_",i))),
+            img_path
+          ), c("name", "content", "profile")
+        )
+
+      }), paste0("person-",1:tracks)
+    )
+
+    
+
+    l["profile-height"] = paste0(ifelse(is.null(input$in_height),6,{
+      validate(fn_validate_range(input$in_height, 1, 10, label = "Image height"))
+      input$in_height
+      }),"cm")
+
+    l["font-size"] = paste0(ifelse(is.null(input$in_size),16,{
+      validate(fn_validate_range(input$in_size, 5, 20, label = "Font size"))
+      input$in_size
+      }),"pt")
+
+    l["gap-above-profile"] = paste0(ifelse(is.null(input$in_gap_above),2,{
+      validate(fn_validate_range(input$in_gap_above, 0, 3, label = "Upper gap"))
+      input$in_gap_above
+      }),"cm")
+
+    l["gap-below-profile"] = paste0(ifelse(is.null(input$in_gap_below),0.6,{
+      validate(fn_validate_range(input$in_gap_below, 0, 3, label = "Lower gap"))
+      input$in_gap_below
+      }),"cm")
+
+    l["persons"] = tracks
+
+    return(l)
+  })
+
+  ## ER: Update button binding -------------------------------------------------
+
+  evr_update <- eventReactive(input$btn_update, {
+    return(fn_vars())
+  })
+
+  ## FN: fn_vars ------------------------------------------------------------
+  ## function to get ui input params
+
+  fn_build <- reactive({
+    vars <- evr_update()
+    #vars <- fn_vars()
+
+    file_name <- switch(vars$persons, "one.qmd", "two.qmd", "three.qmd", "four.qmd", "five.qmd")
+
+    progress_plot <- shiny::Progress$new()
+    progress_plot$set(message = "Creating PDF ...", value = 0.1)
+
+    output_file <- fname()
+    quarto::quarto_render(input = file_name, output_file = output_file, metadata = vars)
+
+    # preview path
+    ppath <- file.path(store$wd, "preview")
+    if (!dir.exists(ppath)) dir.create(ppath)
+    addResourcePath("preview", ppath)
+    if (file.exists(file.path(ppath, output_file))) file.remove(file.path(ppath, output_file))
+    file.copy(output_file, file.path(ppath, output_file))
+    file.remove(output_file)
+    # file.remove("preview.typ")
+
+    progress_plot$set(message = "Completed", value = 1)
+    progress_plot$close()
+  })
+
+  ## OUT: out_pdf -------------------------------------------------------------
   ## plots figure
 
-  output$out_plot <- renderImage(
-    {
-      p <- fn_params()
-      progress1 <- shiny::Progress$new()
-      progress1$set(message = "Generating figure...", value = 40)
-
-      plot_doorsign(
-        dfr = p$dfr, im_profile = p$im_profile, logo_left = p$logo_left, logo_right = p$logo_right,
-        pos_y_text = p$pos_y_text, im_profile_offset_y = p$im_profile_offset_y, im_profile_width = p$im_profile_width,
-        path_export = store$epath, format_export = "png"
-      )
-      progress1$set(message = "Completed.", value = 100)
-      progress1$close()
-
-      scaling <- 2.8
-      return(list(
-        src = file.path(store$epath, "door-sign.png"), contentType = "image/png",
-        width = round(297 * scaling, 0),
-        height = round(210 * scaling, 0),
-        alt = "doorsign"
-      ))
-    },
-    deleteFile = TRUE
-  )
-
-  ## FN: fn_download -----------------------------------------------------------
-  ## function to download a zipped file with images
-
-  fn_download <- function() {
-    p <- fn_params()
-    plot_doorsign(
-      dfr = p$dfr, im_profile = p$im_profile, logo_left = p$logo_left, logo_right = p$logo_right,
-      pos_y_text = p$pos_y_text, im_profile_offset_y = p$im_profile_offset_y, im_profile_width = p$im_profile_width,
-      path_export = store$epath, format_export = "pdf"
-    )
-  }
+  output$out_pdf <- renderUI({
+    fn_build()
+    output_file <- output_file <- fname()
+    return(tags$iframe(src = file.path("preview", output_file), height = "100%", width = "100%"))
+  })
 
   ## DHL: btn_download ---------------------------------------------------------
   ## download handler for downloading zipped file
 
   output$btn_download <- downloadHandler(
-    filename = "door-sign.pdf",
+    filename = fname(),
     content = function(file) {
-      progress <- shiny::Progress$new()
-      progress$set(message = "Generating PDFs...", value = 45)
-      fn_download()
-
-      progress$set(message = "Downloading file...", value = 90)
-      file.copy(file.path(store$epath, "door-sign.pdf"), file, overwrite = T)
-
-      progress$set(message = "Completed.", value = 100)
-      progress$close()
+      fn_build()
+      cpath <- file.path(store$wd, "preview", fname())
+      file.copy(cpath, file, overwrite = T)
+      unlink(cpath)
     }
   )
+
+ ## OBS: set default inputs ------------------------------------------------------------
+  ## observer for updating default inputs
+
+  observe({
+    if(input$in_tracks == 1){
+      updateNumericInput(session,"in_height", "Image height", min = 1, max = 10, step = 0.5, value = 6)
+      updateNumericInput(session,"in_size", "Font size", min = 5, max = 20, step = 1, value = 16)
+      updateNumericInput(session,"in_gap_above", "Upper gap", min = 0, max = 3, step = 0.1, value = 2)
+      updateNumericInput(session,"in_gap_below", "Lower gap", min = 0, max = 3, step = 0.1, value = 0.6)
+      # lapply(1:input$in_tracks, function(i) {
+      #   uupdateTextInput(paste0("in_name_",i), "Name", value = "John Doe", placeholder = paste("Enter name of person",i)),
+      #   updateTextAreaInput(paste0("in_content_",i), "Content", value = txt_content, placeholder = paste("Enter info for person",i), height = "150px"),
+      # })
+    }
+
+    if(input$in_tracks == 2){
+      updateNumericInput(session,"in_height", "Image height", min = 1, max = 10, step = 0.5, value = 4)
+      updateNumericInput(session,"in_size", "Font size", min = 5, max = 20, step = 1, value = 14)
+      updateNumericInput(session,"in_gap_above", "Upper gap", min = 0, max = 3, step = 0.1, value = 0.5)
+      updateNumericInput(session,"in_gap_below", "Lower gap", min = 0, max = 3, step = 0.1, value = 0.1)
+    }
+
+    if(input$in_tracks == 3){
+      updateNumericInput(session,"in_height", "Image height", min = 1, max = 10, step = 0.5, value = 3)
+      updateNumericInput(session,"in_size", "Font size", min = 5, max = 20, step = 1, value = 12)
+      updateNumericInput(session,"in_gap_above", "Upper gap", min = 0, max = 3, step = 0.1, value = 1)
+      updateNumericInput(session,"in_gap_below", "Lower gap", min = 0, max = 3, step = 0.1, value = 0.1)
+    }
+
+    if(input$in_tracks == 4){
+      updateNumericInput(session,"in_height", "Image height", min = 1, max = 10, step = 0.5, value = 3)
+      updateNumericInput(session,"in_size", "Font size", min = 5, max = 20, step = 1, value = 12)
+      updateNumericInput(session,"in_gap_above", "Upper gap", min = 0, max = 3, step = 0.1, value = 1)
+      updateNumericInput(session,"in_gap_below", "Lower gap", min = 0, max = 3, step = 0.1, value = 0.1)
+    }
+
+    if(input$in_tracks == 5){
+      updateNumericInput(session,"in_height", "Image height", min = 1, max = 10, step = 0.5, value = 2.6)
+      updateNumericInput(session,"in_size", "Font size", min = 5, max = 20, step = 1, value = 11)
+      updateNumericInput(session,"in_gap_above", "Upper gap", min = 0, max = 3, step = 0.1, value = 0.5)
+      updateNumericInput(session,"in_gap_below", "Lower gap", min = 0, max = 3, step = 0.1, value = 0.1)
+    }
+  })
+
+  ## OBS: btn_reset ------------------------------------------------------------
+  ## observer for reset
+
+  observeEvent(input$btn_reset, {
+    updateSliderInput(session, "in_tracks", "Number of persons", min = 1, max = 5, value = 1, step = 1)
+  })
+
+  ## OUT: out_text ------------------------------------------------------------
+  ## debug output
+
+  # output$out_text <- renderPrint({
+
+  #   x <- evr_update()
+  #   print(str(x))
+
+  # })
+
 }
 
 shinyApp(ui = ui, server = server)
