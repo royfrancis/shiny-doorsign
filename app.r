@@ -90,8 +90,15 @@ ui <- page_fluid(
 # SERVER -----------------------------------------------------------------------
 
 server <- function(input, output, session) {
-  ## get temporary directory
-  store <- reactiveValues(wd = tempdir())
+  ## create temporary directory
+  temp_dir <- tempdir(check = TRUE)
+  temp_id <- paste(sample(letters, 10), collapse = "")
+  temp_dir_active <- file.path(temp_dir, temp_id)
+  print(paste0("Working directory: ", temp_dir_active))
+  store <- reactiveValues(wd = temp_dir_active, id = temp_id)
+  if (!dir.exists(temp_dir_active)) dir.create(temp_dir_active)
+  system(paste0("bash copy.sh ", temp_dir_active))
+  addResourcePath(temp_id, temp_dir_active)
 
   ## UI: tracks ----------------------------------------------------------------
   ## conditional ui for tracks
@@ -120,7 +127,7 @@ server <- function(input, output, session) {
             ),
             tooltip(
               fileInput(paste0("in_image_", i), "Profile image", multiple = FALSE),
-              paste("Upload profile image for person", i, ". Use an image with square aspect ratio"),
+              paste("Upload profile image for person", i, ". Better to use an image with square aspect ratio"),
               placement = "right",
             )
           )
@@ -145,9 +152,11 @@ server <- function(input, output, session) {
         } else {
           validate(fn_validate_im(cimg))
           ext <- tools::file_ext(cimg$datapath)
-          img_path <- paste0("profile-", i, ".", ext)
+          img_name <- paste0("profile-", i, ".", ext)
+          img_path <- file.path(store$wd, img_name)
           if (file.exists(img_path)) file.remove(img_path)
           file.copy(cimg$datapath, img_path)
+          img_path <- img_name
         }
 
         # create list with person metadata
@@ -213,15 +222,10 @@ server <- function(input, output, session) {
     progress_plot$set(message = "Creating PDF ...", value = 0.1)
 
     output_file <- fname()
-    quarto::quarto_render(input = file_name, output_file = output_file, metadata = vars)
-
-    # preview path
-    ppath <- file.path(store$wd, "preview")
-    if (!dir.exists(ppath)) dir.create(ppath)
-    addResourcePath("preview", ppath)
+    ppath <- store$wd
     if (file.exists(file.path(ppath, output_file))) file.remove(file.path(ppath, output_file))
-    file.copy(output_file, file.path(ppath, output_file))
-    file.remove(output_file)
+    quarto::quarto_render(input = file.path(ppath, file_name), metadata = vars)
+    file.rename(file.path(ppath, sub(".qmd", ".pdf", file_name, fixed = TRUE)), file.path(ppath, output_file))
 
     progress_plot$set(message = "Completed", value = 1)
     progress_plot$close()
@@ -236,7 +240,7 @@ server <- function(input, output, session) {
     } else {
       fn_build()
       output_file <- fname()
-      return(tags$iframe(src = file.path("preview", output_file), height = "100%", width = "100%"))
+      return(tags$iframe(src = file.path(store$id, output_file), height = "100%", width = "100%"))
     }
   })
 
@@ -247,9 +251,9 @@ server <- function(input, output, session) {
     filename = fname(),
     content = function(file) {
       fn_build()
-      cpath <- file.path(store$wd, "preview", fname())
-      file.copy(cpath, file, overwrite = T)
-      unlink(cpath)
+      # cpath <- file.path(store$wd, "preview", fname())
+      file.copy(file.path(store$wd, fname()), file, overwrite = T)
+      unlink(fname())
     }
   )
 
