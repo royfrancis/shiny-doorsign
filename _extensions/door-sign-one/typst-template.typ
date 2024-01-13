@@ -2,6 +2,11 @@
 //#set par(leading: 0.6em)
 //#set block(spacing: 1.4em)
 
+#let ratio(body) = style(styles => {
+  let size = measure(body, styles)
+  (size.height/size.width) + 0pt
+})
+
 #let door-sign-one(
 
   logo-left: none,
@@ -44,19 +49,35 @@
       align(right, image(logo-right, height: 9mm)),
     )
   )
+
   // page body
+
   pad(top: gap-above-profile,
     stack(dir: ttb, spacing: 1em,
 
       // profile image
-      if person-1-profile != none {
-        pad(bottom: gap-below-profile,
-          box(clip: true, stroke: 0pt, radius: profile-height,
-            width: profile-height, height: profile-height,
+      style(styles => {
+      if person-1-profile == none {
+        return
+      }
+
+      let img = image(person-1-profile)
+      let size = measure(img, styles)
+      let ratio = size.height/size.width
+
+      pad(bottom: gap-below-profile,
+        box(clip: true, stroke: 0pt, radius: profile-height,
+          width: profile-height, height: profile-height,
+
+         if ratio < 1 {
             image(person-1-profile, height: profile-height)
-          )
+          } else {
+            image(person-1-profile, width: profile-height)
+          }
+
         )
-      },
+      )
+      }),
 
       // name
       text(size: 1.4em, tracking: 1pt, weight: 600, person-1-name),
@@ -65,6 +86,7 @@
       text(size: 1em, tracking: 0.5pt, person-1-content)
     )
   )
+
 
   // embellishment
   // place(left, rect(width: 1cm, height: 1cm, fill: rgb("#BDD775"))),

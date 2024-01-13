@@ -64,15 +64,31 @@
       grid(
         columns: (30%, 70%),
         row-gutter: gap-below-profile,
+
         // profile image
-        if person-1-profile != none {
-          align(left + horizon,
-            box(clip: true, stroke: 0pt, radius: profile-height,
-              width: profile-height, height: profile-height,
+        style(styles => {
+        if person-1-profile == none {
+          return
+        }
+
+        let img = image(person-1-profile)
+        let size = measure(img, styles)
+        let ratio = size.height/size.width
+
+        pad(bottom: gap-below-profile,
+          box(clip: true, stroke: 0pt, radius: profile-height,
+            width: profile-height, height: profile-height,
+
+          if ratio < 1 {
               image(person-1-profile, height: profile-height)
-            )
+            } else {
+              image(person-1-profile, width: profile-height)
+            }
+
           )
-        },
+        )
+        }),
+
         align(left + horizon,
           stack(
             dir: ttb,
@@ -90,15 +106,31 @@
       grid(
         columns: (30%, 70%),
         row-gutter: 1em,
+
         // profile image
-        if person-2-profile != none {
-          align(left + horizon,
-            box(clip: true, stroke: 0pt, radius: profile-height,
-              width: profile-height, height: profile-height,
+        style(styles => {
+        if person-2-profile == none {
+          return
+        }
+
+        let img = image(person-2-profile)
+        let size = measure(img, styles)
+        let ratio = size.height/size.width
+
+        pad(bottom: gap-below-profile,
+          box(clip: true, stroke: 0pt, radius: profile-height,
+            width: profile-height, height: profile-height,
+
+          if ratio < 1 {
               image(person-2-profile, height: profile-height)
-            )
+            } else {
+              image(person-2-profile, width: profile-height)
+            }
+
           )
-        },
+        )
+        }),
+
         align(left + horizon,
           stack(
             dir: ttb,
@@ -116,15 +148,31 @@
       grid(
       columns: (30%, 70%),
       row-gutter: 1em,
-      // profile image
-      if person-3-profile != none {
-        align(left + horizon,
+
+        // profile image
+        style(styles => {
+        if person-3-profile == none {
+          return
+        }
+
+        let img = image(person-3-profile)
+        let size = measure(img, styles)
+        let ratio = size.height/size.width
+
+        pad(bottom: gap-below-profile,
           box(clip: true, stroke: 0pt, radius: profile-height,
             width: profile-height, height: profile-height,
-            image(person-3-profile, height: profile-height)
+
+          if ratio < 1 {
+              image(person-3-profile, height: profile-height)
+            } else {
+              image(person-3-profile, width: profile-height)
+            }
+
           )
         )
-      },
+        }),
+
       align(
         left + horizon,
         stack(
@@ -143,15 +191,31 @@
       grid(
         columns: (30%, 70%),
         row-gutter: 1em,
+
         // profile image
-        if person-4-profile != none {
-          align(left + horizon,
-            box(clip: true, stroke: 0pt, radius: profile-height,
-              width: profile-height, height: profile-height,
+        style(styles => {
+        if person-4-profile == none {
+          return
+        }
+
+        let img = image(person-4-profile)
+        let size = measure(img, styles)
+        let ratio = size.height/size.width
+
+        pad(bottom: gap-below-profile,
+          box(clip: true, stroke: 0pt, radius: profile-height,
+            width: profile-height, height: profile-height,
+
+          if ratio < 1 {
               image(person-4-profile, height: profile-height)
-            )
+            } else {
+              image(person-4-profile, width: profile-height)
+            }
+
           )
-        },
+        )
+        }),
+
         align(
           left + horizon,
           stack(
@@ -170,15 +234,31 @@
       grid(
         columns: (30%, 70%),
         row-gutter: 1em,
+
         // profile image
-        if person-5-profile != none {
-          align(left + horizon,
-            box(clip: true, stroke: 0pt, radius: profile-height,
-              width: profile-height, height: profile-height,
+        style(styles => {
+        if person-5-profile == none {
+          return
+        }
+
+        let img = image(person-5-profile)
+        let size = measure(img, styles)
+        let ratio = size.height/size.width
+
+        pad(bottom: gap-below-profile,
+          box(clip: true, stroke: 0pt, radius: profile-height,
+            width: profile-height, height: profile-height,
+
+          if ratio < 1 {
               image(person-5-profile, height: profile-height)
-            )
+            } else {
+              image(person-5-profile, width: profile-height)
+            }
+
           )
-        },
+        )
+        }),
+
         align(
           left + horizon,
           stack(

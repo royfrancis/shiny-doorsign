@@ -42,10 +42,10 @@ fn_validate <- function(input, message1, message2, message3) {
 fn_validate_range <- function(value, min, max, label = NULL) {
   if (!is.numeric(value)) {
     return(paste0("The input '", label, "' must be a number."))
-  } else{
+  } else {
     if (value < min || value > max) {
       return(paste0("The input '", label, "' must be between ", min, " and ", max, "."))
-    }else{
+    } else {
       NULL
     }
   }
@@ -67,8 +67,8 @@ fn_validate_im <- function(x) {
 sample_data_1 <- list(
   "person-1" = list(
     "name" = "Ingrid Bergqvist",
-    "content" = 
-"**Manager, NBIS** \\
+    "content" =
+      "**Manager, NBIS** \\
 Dept. of Cell and Molecular Biology (ICM) \\
 Uppsala University \\
 ingrid.bergqvist@nbis.se \\
@@ -79,39 +79,41 @@ ingrid.bergqvist@nbis.se \\
 sample_data_5 <- list(
   "person-1" = list(
     "name" = "Jimmy Bodin",
-    "content" = 
-"**Systems Developer, NBIS** \\
+    "content" =
+      "**Systems Developer, NBIS** \\
 Dept. of Cell and Molecular Biology (ICM) \\
 jimmy.bodin@nbis.se"
   ),
-    "person-2" = list(
+  "person-2" = list(
     "name" = "Sonja Andersson",
-    "content" = 
-"**Bioinformatician, NBIS** \\
+    "content" =
+      "**Bioinformatician, NBIS** \\
 Dept. of Med. Biochem & Microb (IMBIM) \\
 sonja.andersson@nbis.se"
   ),
-    "person-3" = list(
+  "person-3" = list(
     "name" = "Fredrik Holmberg",
-    "content" = 
-"**Bioinformatician, NBIS** \\
+    "content" =
+      "**Bioinformatician, NBIS** \\
 Dept. of Med. Biochem & Microb (IMBIM) \\
 fredrik.holmberg@nbis.se"
   ),
-    "person-4" = list(
+  "person-4" = list(
     "name" = "Ellinor Berglund",
-    "content" = 
-"**Bioinformatician, NBIS** \\
+    "content" =
+      "**Bioinformatician, NBIS** \\
 Dept. of Imm., Genetics & Pathology (IGP) \\
 ellinor.berglund@nbis.se"
   ),
-    "person-5" = list(
+  "person-5" = list(
     "name" = "Inga Magnusson",
-    "content" = 
-"**Bioinformatician, NBIS** \\
+    "content" =
+      "**Bioinformatician, NBIS** \\
 Dept. of Imm., Genetics & Pathology (IGP) \\
 inga.magnusson@nbis.se"
   )
 )
 
-fname <- function() return(paste0("door-sign-",fn_version(),".pdf"))
+fname <- function() {
+  return(paste0("door-sign-", fn_version(), ".pdf"))
+}
