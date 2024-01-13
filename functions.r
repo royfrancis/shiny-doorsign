@@ -3,7 +3,7 @@
 
 # fn_version
 fn_version <- function() {
-  return("v2.0")
+  return("v2.1")
 }
 
 # validation
