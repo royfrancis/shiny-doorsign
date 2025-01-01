@@ -1,9 +1,17 @@
 # doorsign
 # functions
 
+# create temporary directory
+fn_dir <- function(session) {
+  wd <- file.path(tempdir(check = TRUE), session$token)
+  if (!dir.exists(wd)) dir.create(wd)
+  cat(paste0("Temp directory: ", wd, "\n"))
+  return(wd)
+}
+
 # fn_version
 fn_version <- function() {
-  return("v2.1")
+  return("v2.1.1")
 }
 
 # validation
@@ -63,6 +71,41 @@ fn_validate_im <- function(x) {
     }
   }
 }
+
+# copy directories
+copy_dirs <- function(path) {
+  dirs_to_copy <- c("_extensions", "fonts", "www", "assets")
+
+  # ensure the directory exists and copy the contents
+  copy_directory <- function(dir_name) {
+    dir_to_create <- file.path(path, dir_name)
+    if (!dir.exists(dir_to_create)) {
+      dir.create(dir_to_create, recursive = TRUE)
+    }
+    file.copy(
+      from = list.files(dir_name, full.names = TRUE),
+      to = dir_to_create,
+      recursive = TRUE
+    )
+  }
+
+  for (dir_name in dirs_to_copy) {
+    copy_directory(dir_name)
+  }
+
+  # copy files with extensions *.r and *.qmd to output directory
+  files_to_copy_r <- list.files(pattern = "\\.r$", full.names = TRUE)
+  files_to_copy_qmd <- list.files(pattern = "\\.qmd$", full.names = TRUE)
+
+  if (length(files_to_copy_r) > 0) {
+    file.copy(from = files_to_copy_r, to = path)
+  }
+
+  if (length(files_to_copy_qmd) > 0) {
+    file.copy(from = files_to_copy_qmd, to = path)
+  }
+}
+
 
 sample_data_1 <- list(
   "person-1" = list(

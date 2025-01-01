@@ -22,4 +22,4 @@ The app should be available through a web browser at `http://0.0.0.0:8787`.
 
 ---
 
-2024 • Roy Francis
+2025 • Roy Francis

@@ -15,6 +15,7 @@ ui <- page_fluid(
   title = "NBIS Doorsign",
   theme = bs_theme(preset = "zephyr", primary = "#A7C947"),
   tags$head(tags$link(rel = "stylesheet", type = "text/css", href = "styles.css")),
+  lang = "en",
   card(
     full_screen = TRUE,
     card_header(
@@ -94,10 +95,10 @@ server <- function(input, output, session) {
   temp_dir <- tempdir(check = TRUE)
   temp_id <- paste(sample(letters, 10), collapse = "")
   temp_dir_active <- file.path(temp_dir, temp_id)
-  print(paste0("Working directory: ", temp_dir_active))
-  store <- reactiveValues(wd = temp_dir_active, id = temp_id)
+  cat(paste0("Working directory: ", temp_dir_active, "\n"))
+  store <- reactiveValues(wd = temp_dir_active, id = temp_id, bg_path = NULL)
   if (!dir.exists(temp_dir_active)) dir.create(temp_dir_active)
-  system(paste0("bash copy.sh ", temp_dir_active))
+  copy_dirs(temp_dir_active)
   addResourcePath(temp_id, temp_dir_active)
 
   ## UI: tracks ----------------------------------------------------------------
@@ -297,7 +298,7 @@ server <- function(input, output, session) {
       updateNumericInput(session, "in_height", "Image height", min = 1, max = 10, step = 0.5, value = 2.6)
       updateNumericInput(session, "in_size", "Font size", min = 5, max = 20, step = 1, value = 11)
       updateNumericInput(session, "in_gap_above", "Upper gap", min = 0, max = 3, step = 0.1, value = 0.5)
-      updateNumericInput(session, "in_gap_below", "Lower gap", min = 0, max = 3, step = 0.1, value = 0.1)
+      updateNumericInput(session, "in_gap_below", "Lower gap", min = 0, max = 3, step = 0.1, value = 0)
     }
   })
 
@@ -306,6 +307,16 @@ server <- function(input, output, session) {
 
   observeEvent(input$btn_reset, {
     updateSliderInput(session, "in_tracks", "Number of persons", min = 1, max = 5, value = 1, step = 1)
+  })
+
+  ## OSE -----------------------------------------------------------------------
+  ## delete user directory when session ends
+
+  session$onSessionEnded(function() {
+    cat(paste0("Removing working directory: ", isolate(store$wd), " ...\n"))
+    if (dir.exists(isolate(store$wd))) {
+      unlink(isolate(store$wd), recursive = TRUE)
+    }
   })
 
   ## OUT: out_text ------------------------------------------------------------
