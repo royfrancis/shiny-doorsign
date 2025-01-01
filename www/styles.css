@@ -33,6 +33,10 @@ hr {
 #out_pdf {
   height: 100%;
   overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.5em;
 }
 
 .form-control {
@@ -42,6 +46,7 @@ hr {
 .help-note {
   font-size: 0.7rem;
   color: #C0C0C0;
+  margin-top: 2px;
 }
 
 .app-header {
