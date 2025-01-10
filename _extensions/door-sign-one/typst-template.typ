@@ -15,7 +15,7 @@
   gap-above-profile: 2cm,
   gap-below-profile: 0.6cm,
   font-size: 16pt,
-  par-leading: 0.6em,
+  tracking: 0pt,
 
   person-1-name: none,
   person-1-content: none,
@@ -27,7 +27,6 @@
 
   // body font.
   set text(font-size, font: "Lato", fill: rgb("#444444"))
-  // set par(leading: par-leading)
   // set block(spacing: 1.4em)
 
   // set document(title: title)
@@ -80,10 +79,10 @@
       }),
 
       // name
-      text(size: 1.4em, tracking: 1pt, weight: 600, person-1-name),
+      text(size: 1.4em, tracking: tracking, weight: 600, person-1-name),
 
       // content
-      text(size: 1em, tracking: 0.5pt, person-1-content)
+      text(size: 1em, tracking: tracking, person-1-content)
     )
   )
 

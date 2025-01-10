@@ -23,6 +23,10 @@
   $if(gap-below-profile)$
   gap-below-profile: $gap-below-profile$,
   $endif$
+  
+  $if(tracking)$
+  tracking: $tracking$,
+  $endif$
 
   // person info 1
   $if(person-1.name)$

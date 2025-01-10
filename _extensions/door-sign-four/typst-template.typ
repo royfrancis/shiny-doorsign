@@ -6,7 +6,7 @@
   gap-above-profile: 2cm,
   gap-below-profile: 0.6cm,
   font-size: 16pt,
-  par-leading: 0.6em,
+  tracking: 0pt,
 
   person-1-name: none,
   person-1-content: none,
@@ -91,10 +91,10 @@
           spacing: 1em,
 
           // name
-          text(size: 1.4em, tracking: 1pt, weight: 600, person-1-name),
+          text(size: 1.4em, tracking: tracking, weight: 600, person-1-name),
 
           // content
-          text(size: 1em, tracking: 0.5pt, person-1-content)
+          text(size: 1em, tracking: tracking, person-1-content)
         ))
     ),
 
@@ -132,10 +132,10 @@
           spacing: 1em,
 
           // name
-          text(size: 1.4em, tracking: 1pt, weight: 600, person-2-name),
+          text(size: 1.4em, tracking: tracking, weight: 600, person-2-name),
 
           // content
-          text(size: 1em, tracking: 0.5pt, person-2-content)
+          text(size: 1em, tracking: tracking, person-2-content)
         )
       )
     ),
@@ -175,10 +175,10 @@
           spacing: 1em,
 
           // name
-          text(size: 1.4em, tracking: 1pt, weight: 600, person-3-name),
+          text(size: 1.4em, tracking: tracking, weight: 600, person-3-name),
 
           // content
-          text(size: 1em, tracking: 0.5pt, person-3-content)
+          text(size: 1em, tracking: tracking, person-3-content)
         )
       )
     ),
@@ -218,10 +218,10 @@
           spacing: 1em,
 
           // name
-          text(size: 1.4em, tracking: 1pt, weight: 600, person-4-name),
+          text(size: 1.4em, tracking: tracking, weight: 600, person-4-name),
 
           // content
-          text(size: 1em, tracking: 0.5pt, person-4-content)
+          text(size: 1em, tracking: tracking, person-4-content)
         )
       )
     )

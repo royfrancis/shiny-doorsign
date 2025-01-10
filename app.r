@@ -40,12 +40,12 @@ ui <- page_fluid(
               layout_columns(
                 tooltip(
                   numericInput("in_height", "Image height", min = 1, max = 10, step = 0.5, value = 6),
-                  "Height of profile image. Value between 1 and 10.",
+                  "Height of profile image. Value between 1 and 10 cm.",
                   placement = "right"
                 ),
                 tooltip(
                   numericInput("in_size", "Font size", min = 5, max = 20, step = 1, value = 16),
-                  "Base font size. Value between 5 and 20.",
+                  "Base font size. Value between 5 and 20 pt.",
                   placement = "right"
                 ),
                 col_width = c(6, 6)
@@ -53,15 +53,20 @@ ui <- page_fluid(
               layout_columns(
                 tooltip(
                   numericInput("in_gap_above", "Upper gap", min = 0, max = 3, step = 0.1, value = 2),
-                  "Value between 0 and 3.",
+                  "Value between 0 and 3 cm.",
                   placement = "right"
                 ),
                 tooltip(
                   numericInput("in_gap_below", "Lower gap", min = 0, max = 3, step = 0.1, value = 0.6),
-                  "Value between 0 and 3.",
+                  "Value between 0 and 3 cm.",
                   placement = "right"
                 ),
                 col_width = c(6, 6)
+              ),
+              tooltip(
+                sliderInput("in_tracking", "Tracking", min = 0, max = 0.2, step = 0.01, value = 0.02),
+                "Character spacing. Value between 0 and 0.2 pt.",
+                placement = "right"
               )
             )
           )
@@ -82,7 +87,7 @@ ui <- page_fluid(
       div(
         class = "help-note",
         paste0(format(Sys.time(), "%Y"), " Roy Francis • Version: ", fn_version()),
-        HTML("• <a href='https://github.com/royfrancis/shiny-doorsign' target='_blank'><i class='fab fa-github'></i></a> • <a href='mailto:roy.francis@nbis.se' target='_blank'><i class='fa fa-envelope'></i></a>")
+        HTML("• <a href='https://github.com/royfrancis/shiny-doorsign' target='_blank'><i class='fab fa-github'></i></a> <U+2022> <a href='mailto:roy.francis@nbis.se' target='_blank'><i class='fa fa-envelope'></i></a>")
       )
     )
   )
@@ -192,6 +197,11 @@ server <- function(input, output, session) {
       validate(fn_validate_range(input$in_gap_below, 0, 3, label = "Lower gap"))
       input$in_gap_below
     }), "cm")
+
+    l["tracking"] <- paste0(ifelse(is.null(input$in_tracking), 0.4, {
+      validate(fn_validate_range(input$in_tracking, -1.0, 1.0, label = "Tracking"))
+      input$in_tracking
+    }), "em")
 
     l["persons"] <- tracks
 
@@ -307,6 +317,7 @@ server <- function(input, output, session) {
 
   observeEvent(input$btn_reset, {
     updateSliderInput(session, "in_tracks", "Number of persons", min = 1, max = 5, value = 1, step = 1)
+    updateSliderInput(session, "in_tracking", "Tracking", min = 0, max = 0.2, step = 0.01, value = 0.02)
   })
 
   ## OSE -----------------------------------------------------------------------
